@@ -1,5 +1,7 @@
 Django==5.2.14
-django-allauth
+django-allauth[socialaccount]
+PyJWT
+requests
 daphne
 channels
 channels-redis
