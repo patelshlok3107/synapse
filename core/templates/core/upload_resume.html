@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card p-4 mt-5">
+            <h2 class="text-center mb-4">Upload Your Resume</h2>
+            <p class="text-muted text-center mb-4">Upload your resume in PDF or DOCX format. Our AI will analyze it to generate tailored interview questions.</p>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <div class="d-grid mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg">Upload and Parse</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

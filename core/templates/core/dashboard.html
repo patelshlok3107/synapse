@@ -1,0 +1,393 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .dashboard-header {
+        margin-bottom: 3rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        border-bottom: 1px solid #222;
+        padding-bottom: 1.5rem;
+    }
+    
+    .stat-card {
+        background: #111;
+        border: 1px solid #222;
+        border-radius: 20px;
+        padding: 2rem;
+        transition: transform 0.3s;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+        border-color: rgba(0,229,143,0.3);
+    }
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0; right: 0; width: 100px; height: 100px;
+        background: radial-gradient(circle, rgba(0,229,143,0.1) 0%, transparent 70%);
+        border-bottom-left-radius: 100px;
+    }
+    
+    .list-group-custom .list-group-item {
+        background: #0a0a0a;
+        border: 1px solid #1a1a1a;
+        margin-bottom: 10px;
+        border-radius: 12px !important;
+        transition: all 0.3s;
+    }
+    .list-group-custom .list-group-item:hover {
+        background: #111;
+        border-color: #333;
+    }
+
+    /* Chatbot Styles */
+    #chat-widget {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        z-index: 1000;
+    }
+    
+    #chat-toggle {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: var(--neon-green);
+        color: #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        cursor: pointer;
+        box-shadow: 0 5px 20px rgba(0,229,143,0.4);
+        transition: transform 0.3s;
+    }
+    #chat-toggle:hover { transform: scale(1.1); }
+    
+    #chat-window {
+        position: absolute;
+        bottom: 80px;
+        right: 0;
+        width: 350px;
+        height: 500px;
+        background: #111;
+        border: 1px solid #333;
+        border-radius: 20px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(20px);
+        transition: all 0.3s ease;
+    }
+    #chat-window.open {
+        opacity: 1;
+        pointer-events: all;
+        transform: translateY(0);
+    }
+    
+    .chat-header {
+        background: #1a1a1a;
+        padding: 15px 20px;
+        border-bottom: 1px solid #333;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .chat-messages {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    .msg {
+        max-width: 80%;
+        padding: 12px 16px;
+        border-radius: 16px;
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+    .msg-user {
+        align-self: flex-end;
+        background: var(--neon-green);
+        color: #000;
+        border-bottom-right-radius: 4px;
+    }
+    .msg-ai {
+        align-self: flex-start;
+        background: #222;
+        color: #fff;
+        border-bottom-left-radius: 4px;
+    }
+    .chat-input-area {
+        padding: 15px;
+        background: #1a1a1a;
+        border-top: 1px solid #333;
+        display: flex;
+        gap: 10px;
+    }
+    .chat-input {
+        flex: 1;
+        background: #0a0a0a;
+        border: 1px solid #333;
+        border-radius: 20px;
+        padding: 8px 15px;
+        color: #fff;
+        outline: none;
+    }
+    .chat-input:focus { border-color: var(--neon-green); }
+    .chat-send {
+        background: var(--neon-green);
+        color: #000;
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .typing-indicator {
+        display: none;
+        align-self: flex-start;
+        background: transparent;
+        padding: 10px;
+    }
+    .typing-indicator span {
+        display: inline-block;
+        width: 6px; height: 6px;
+        background: #666;
+        border-radius: 50%;
+        margin-right: 4px;
+        animation: typing 1s infinite alternate;
+    }
+    .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-indicator span:nth-child(3) { animation-delay: 0.4s; margin-right: 0; }
+    @keyframes typing { to { transform: translateY(-4px); background: #fff; } }
+</style>
+
+<div class="dashboard-header">
+    <div>
+        <h1 class="h2 mb-1" style="font-weight: 700;">Welcome back, <span style="color: var(--neon-green); font-family: 'Caveat', cursive; font-size: 1.2em;">{{ user.username }}</span></h1>
+        <p class="text-secondary mb-0">Here's a summary of your interview preparation progress.</p>
+    </div>
+    <div>
+        <a href="{% url 'core:start_interview' %}" class="btn btn-primary px-4" style="border-radius: 20px;">+ New Interview</a>
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
+    <div class="col-md-4">
+        <div class="stat-card">
+            <p class="text-secondary mb-1 text-uppercase" style="letter-spacing: 0.1em; font-size: 0.8rem;">Interviews Completed</p>
+            <h2 class="display-4 text-white font-weight-bold">{{ total_interviews }}</h2>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card" style="border-color: rgba(0,229,143,0.3);">
+            <p class="text-secondary mb-1 text-uppercase" style="letter-spacing: 0.1em; font-size: 0.8rem;">Average Score</p>
+            <h2 class="display-4 font-weight-bold" style="color: var(--neon-green);">{{ avg_score }}<span style="font-size: 0.5em;">%</span></h2>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <p class="text-secondary mb-1 text-uppercase" style="letter-spacing: 0.1em; font-size: 0.8rem;">Action Center</p>
+            <h5 class="text-white mt-3">Ready to improve?</h5>
+            <a href="{% url 'core:upload_resume' %}" class="btn btn-outline-light btn-sm mt-2" style="border-radius: 12px;">Upload New Resume</a>
+        </div>
+    </div>
+</div>
+
+<div class="row g-5">
+    <!-- Recent Interviews -->
+    <div class="col-md-6">
+        <h4 class="mb-4">Recent Interviews</h4>
+        <div class="list-group list-group-custom">
+            {% if interviews %}
+                {% for interview in interviews|slice:":5" %}
+                <div class="list-group-item p-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-white mb-1">{{ interview.interview_type }}</h6>
+                        <small class="text-secondary">{{ interview.created_at|date:"M d, Y" }}</small>
+                    </div>
+                    <div>
+                        {% if interview.status == 'Completed' %}
+                            <span class="badge" style="background: rgba(0,229,143,0.1); color: var(--neon-green); border: 1px solid var(--neon-green); font-size: 1rem; padding: 8px 12px;">
+                                {{ interview.overall_score|default:0|floatformat:1 }}%
+                            </span>
+                        {% else %}
+                            <span class="badge bg-secondary text-dark px-3 py-2">Pending</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="text-center p-5 rounded" style="background: #111; border: 1px dashed #333;">
+                    <p class="text-muted mb-3">No interviews attempted yet.</p>
+                    <a href="{% url 'core:start_interview' %}" class="btn btn-outline-primary btn-sm">Start Practice</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Uploaded Resumes -->
+    <div class="col-md-6">
+        <h4 class="mb-4">Your Resumes</h4>
+        <div class="list-group list-group-custom">
+            {% if resumes %}
+                {% for resume in resumes %}
+                <a href="{% url 'core:resume_detail' resume.id %}" class="list-group-item p-4 d-flex justify-content-between align-items-center text-decoration-none">
+                    <div>
+                        <h6 class="text-white mb-1">Resume {{ forloop.counter }}</h6>
+                        <small class="text-secondary">Uploaded: {{ resume.uploaded_at|date:"M d, Y" }}</small>
+                    </div>
+                    <span class="text-secondary" style="font-size: 1.5rem;">→</span>
+                </a>
+                {% endfor %}
+            {% else %}
+                <div class="text-center p-5 rounded" style="background: #111; border: 1px dashed #333;">
+                    <p class="text-muted mb-3">You haven't uploaded any resumes yet.</p>
+                    <a href="{% url 'core:upload_resume' %}" class="btn btn-outline-primary btn-sm">Upload Resume</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- ================= AI CHATBOT WIDGET ================= -->
+<div id="chat-widget">
+    <!-- Chat Window -->
+    <div id="chat-window">
+        <div class="chat-header">
+            <div>
+                <strong class="text-white">AI Coach</strong>
+                <span style="display: block; font-size: 0.75rem; color: #00E58F;">Online</span>
+            </div>
+            <button id="close-chat" class="btn-close btn-close-white" style="font-size: 0.8rem;"></button>
+        </div>
+        
+        <div class="chat-messages" id="chat-messages">
+            <div class="msg msg-ai">Hi {{ user.username }}! I'm your AI Interview Coach. How can I help you prepare today?</div>
+            
+            <div class="typing-indicator" id="typing-indicator">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        
+        <div class="chat-input-area">
+            <input type="text" id="chat-input" class="chat-input" placeholder="Ask a question..." autocomplete="off">
+            <button id="send-btn" class="chat-send">➤</button>
+        </div>
+    </div>
+    
+    <!-- Floating Toggle Button -->
+    <div id="chat-toggle">
+        💬
+    </div>
+</div>
+
+<!-- CSRF Token for JS fetch -->
+<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chatToggle = document.getElementById('chat-toggle');
+    const chatWindow = document.getElementById('chat-window');
+    const closeChat = document.getElementById('close-chat');
+    const chatInput = document.getElementById('chat-input');
+    const sendBtn = document.getElementById('send-btn');
+    const messagesBox = document.getElementById('chat-messages');
+    const typingIndicator = document.getElementById('typing-indicator');
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
+    // Toggle window
+    chatToggle.addEventListener('click', () => {
+        chatWindow.classList.toggle('open');
+        if(chatWindow.classList.contains('open')) chatInput.focus();
+    });
+    
+    closeChat.addEventListener('click', () => {
+        chatWindow.classList.remove('open');
+    });
+    
+    // Send message logic
+    function sendMessage() {
+        const text = chatInput.value.trim();
+        if(!text) return;
+        
+        // Append user msg
+        const userMsg = document.createElement('div');
+        userMsg.className = 'msg msg-user';
+        userMsg.textContent = text;
+        messagesBox.insertBefore(userMsg, typingIndicator);
+        
+        chatInput.value = '';
+        messagesBox.scrollTop = messagesBox.scrollHeight;
+        
+        // Show typing
+        typingIndicator.style.display = 'block';
+        messagesBox.scrollTop = messagesBox.scrollHeight;
+        
+        // Fetch AI reply using streaming
+        fetch('{% url "core:chatbot" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({ message: text })
+        })
+        .then(async res => {
+            typingIndicator.style.display = 'none';
+            
+            // Handle errors
+            if (!res.ok) {
+                const data = await res.json();
+                throw new Error(data.error || 'Network response was not ok');
+            }
+            
+            const aiMsg = document.createElement('div');
+            aiMsg.className = 'msg msg-ai';
+            messagesBox.insertBefore(aiMsg, typingIndicator);
+            messagesBox.scrollTop = messagesBox.scrollHeight;
+            
+            const reader = res.body.getReader();
+            const decoder = new TextDecoder();
+            
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                const textChunk = decoder.decode(value, { stream: true });
+                // Append text and handle newlines
+                aiMsg.innerHTML += textChunk.replace(/\n/g, '<br>');
+                messagesBox.scrollTop = messagesBox.scrollHeight;
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            typingIndicator.style.display = 'none';
+            const aiMsg = document.createElement('div');
+            aiMsg.className = 'msg msg-ai text-danger';
+            aiMsg.textContent = 'Error: ' + err.message;
+            messagesBox.insertBefore(aiMsg, typingIndicator);
+            messagesBox.scrollTop = messagesBox.scrollHeight;
+        });
+    }
+    
+    sendBtn.addEventListener('click', sendMessage);
+    chatInput.addEventListener('keypress', (e) => {
+        if(e.key === 'Enter') sendMessage();
+    });
+});
+</script>
+{% endblock %}

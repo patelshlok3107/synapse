@@ -1,0 +1,238 @@
+{% extends 'base.html' %}
+
+{% block navbar %}
+<!-- Hide navbar for auth pages -->
+{% endblock %}
+
+{% block content_container %}
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden; /* Prevent scrolling during 3D effect */
+        background: radial-gradient(circle at center, #113324 0%, #050505 60%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        perspective: 1500px;
+    }
+    
+    .auth-wrapper {
+        width: 1000px;
+        height: 650px;
+        display: flex;
+        border-radius: 24px;
+        box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+        transform-style: preserve-3d;
+        /* Animation on load */
+        opacity: 0;
+        transform: translateY(50px) rotateX(10deg);
+        animation: entrance 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+    
+    @keyframes entrance {
+        to { opacity: 1; transform: translateY(0) rotateX(0deg); }
+    }
+
+    .auth-left {
+        flex: 1;
+        background: rgba(10, 10, 10, 0.95);
+        border-top-left-radius: 24px;
+        border-bottom-left-radius: 24px;
+        padding: 4rem 3rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        position: relative;
+        transform: translateZ(20px); /* 3D depth */
+    }
+
+    .auth-right {
+        flex: 1;
+        background-color: var(--neon-green);
+        border-radius: 24px;
+        padding: 4rem 3rem;
+        position: relative;
+        transform: translateZ(50px); /* Pops out more than left side */
+        box-shadow: -10px 0 30px rgba(0,0,0,0.2);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    
+    /* The wavy corner effect on the right pane (approximated) */
+    .auth-right::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 80px;
+        height: 80px;
+        background: #050505;
+        border-bottom-left-radius: 40px;
+    }
+
+    .custom-input {
+        background: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 12px 16px;
+        width: 100%;
+        color: #000;
+        margin-bottom: 20px;
+        font-weight: 500;
+        transition: box-shadow 0.3s;
+    }
+    .custom-input:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px var(--neon-green-glow);
+    }
+    
+    .social-icons {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 30px;
+    }
+    .social-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #000;
+        text-decoration: none;
+    }
+    
+    .quote-box {
+        margin-top: 2rem;
+    }
+    
+    .white-card {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        position: absolute;
+        bottom: 30px;
+        left: -30px; /* Overlaps into left pane */
+        right: 30px;
+        color: #000;
+        box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        transform: translateZ(80px); /* Highest depth */
+    }
+    
+    .floating-star {
+        position: absolute;
+        right: 30px;
+        bottom: 180px;
+        width: 50px;
+        height: 50px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: black;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transform: translateZ(90px);
+    }
+
+</style>
+
+<div class="auth-wrapper" id="tilt-box">
+    
+    <!-- Left Pane: Form -->
+    <div class="auth-left">
+        <h5 style="position: absolute; top: 30px; left: 30px; font-weight: bold;">Habu</h5>
+        
+        <h2 class="mb-2 font-weight-bold">Welcome back</h2>
+        <p class="text-secondary mb-4">Please Enter your Account details</p>
+        
+        <form method="post">
+            {% csrf_token %}
+            {% if form.errors %}
+                <div class="alert alert-danger p-2 mb-3">Invalid username or password.</div>
+            {% endif %}
+            
+            <label class="form-label text-white" style="font-size: 0.9em;">Username / Email</label>
+            <input type="text" name="username" class="custom-input" placeholder="Johndoe@gmail.com" required>
+            
+            <label class="form-label text-white" style="font-size: 0.9em;">Password</label>
+            <input type="password" name="password" class="custom-input" placeholder="••••••••" required>
+            
+            <div class="text-end mb-3">
+                <a href="#" class="text-white text-decoration-none" style="font-size: 0.85em; text-decoration: underline !important;">Forgot Password</a>
+            </div>
+            
+            <button type="submit" class="btn btn-primary w-100 py-2" style="border-radius: 8px;">Sign in</button>
+        </form>
+        {% load socialaccount %}
+        <div style="display:flex; align-items:center; gap:12px; margin: 20px 0 10px;">
+            <div style="flex:1; height:1px; background:rgba(255,255,255,0.15);"></div>
+            <span style="font-size:0.78em; color:#888; white-space:nowrap;">or continue with</span>
+            <div style="flex:1; height:1px; background:rgba(255,255,255,0.15);"></div>
+        </div>
+        <div style="display:flex; justify-content:center; align-items:center; gap:16px; margin-bottom:8px;">
+            <a href="{% provider_login_url 'google' %}" title="Sign in with Google"
+               style="display:flex; align-items:center; gap:8px; padding:10px 20px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); border-radius:10px; text-decoration:none; color:#fff; font-size:0.88em; font-weight:500; transition:all 0.25s ease;"
+               onmouseover="this.style.background='rgba(255,255,255,0.16)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="G" style="width:18px;height:18px;">
+                Google
+            </a>
+            <a href="{% provider_login_url 'github' %}" title="Sign in with GitHub"
+               style="display:flex; align-items:center; gap:8px; padding:10px 20px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); border-radius:10px; text-decoration:none; color:#fff; font-size:0.88em; font-weight:500; transition:all 0.25s ease;"
+               onmouseover="this.style.background='rgba(255,255,255,0.16)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">
+                <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="Git" style="width:18px;height:18px;filter:invert(1);">
+                GitHub
+            </a>
+        </div>
+        
+        <div class="text-center mt-5">
+            <a href="{% url 'core:register' %}" class="text-white text-decoration-none" style="font-size: 0.85em; text-decoration: underline !important;">Create an account</a>
+        </div>
+    </div>
+    
+    <!-- Right Pane: Showcase -->
+    <div class="auth-right">
+        <h1 style="color: white; font-weight: 700; font-size: 3rem; line-height: 1.1;">What's our<br>Jobseekers Said.</h1>
+        <h1 style="color: white; font-size: 4rem; margin: -10px 0 0 0;">“</h1>
+        
+        <div class="quote-box">
+            <p style="color: white; font-weight: 500; font-size: 1.1rem; line-height: 1.5;">
+                "Search and find your dream job is now easier than ever. Just browse a job and apply if you need to."
+            </p>
+            <p style="color: white; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0;">Mas Parjono</p>
+            <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">UI Designer at Google</p>
+        </div>
+        
+        <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-light" style="width: 40px; height: 40px; border-radius: 8px;">&larr;</button>
+            <button class="btn btn-dark" style="width: 40px; height: 40px; border-radius: 8px; background: #1a1a1a;">&rarr;</button>
+        </div>
+        
+        <div class="floating-star">✦</div>
+        
+        <div class="white-card">
+            <h5 style="font-weight: 700; margin-bottom: 10px;">Get your right job and right<br>place apply now</h5>
+            <p class="text-muted" style="font-size: 0.85rem; max-width: 250px; margin-bottom: 0;">Be among the first founders to experience the easiest way to start run a business.</p>
+        </div>
+    </div>
+    
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
+<script>
+    VanillaTilt.init(document.querySelector("#tilt-box"), {
+        max: 5,           // maximum tilt rotation (degrees)
+        speed: 400,       // Speed of the enter/exit transition
+        glare: true,      // enable glare effect
+        "max-glare": 0.1, // max glare opacity
+        scale: 1.02       // slight zoom on hover
+    });
+</script>
+{% endblock %}

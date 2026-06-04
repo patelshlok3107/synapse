@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synapse</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Caveat:wght@600;700&family=Yellowtail&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #1a120a;
+            --text-primary: #f0e8dc;
+            --text-secondary: #c4ad95;
+            --accent: #cf884d;
+            --accent-glow: rgba(207, 136, 77, 0.4);
+            --card-bg: rgba(12, 8, 4, 0.72);
+            --card-border: rgba(207, 136, 77, 0.18);
+            /* legacy compat */
+            --neon-green: #cf884d;
+            --neon-green-glow: rgba(207, 136, 77, 0.4);
+        }
+
+        /* === GLOBAL IMPRESSIONIST BG CANVAS === */
+        #paintBg {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -3;
+            pointer-events: none;
+        }
+
+        body {
+            background: transparent;
+            color: var(--text-primary);
+            font-family: 'Outfit', sans-serif;
+            min-height: 100vh;
+        }
+
+        .cursive-accent {
+            font-family: 'Caveat', cursive;
+            color: var(--accent);
+            font-size: 1.5em;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        /* === NAVBAR === */
+        .navbar {
+            background: rgba(10, 6, 2, 0.82) !important;
+            backdrop-filter: blur(16px) saturate(1.4);
+            -webkit-backdrop-filter: blur(16px) saturate(1.4);
+            border-bottom: 1px solid rgba(207, 136, 77, 0.18);
+            padding: 1rem 0;
+        }
+        .navbar-brand {
+            font-family: 'Yellowtail', cursive !important;
+            font-size: 2rem !important;
+            color: #ebd8c7 !important;
+            text-shadow: 2px 2px 0px #cf884d;
+            letter-spacing: 0;
+        }
+        .nav-link {
+            color: var(--text-secondary) !important;
+            font-weight: 400;
+            transition: color 0.2s ease;
+        }
+        .nav-link:hover { color: var(--text-primary) !important; }
+
+        /* === BUTTONS === */
+        .btn-primary, .btn-success {
+            background: var(--accent);
+            color: #0a0500;
+            font-weight: 700;
+            border: none;
+            border-radius: 8px;
+            padding: 0.5rem 1.5rem;
+            box-shadow: 0 4px 18px var(--accent-glow);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover, .btn-success:hover {
+            background: #e09a5a;
+            color: #0a0500;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(207, 136, 77, 0.55);
+        }
+        .btn-outline-primary {
+            background: transparent;
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            font-weight: 600;
+            box-shadow: 0 0 10px rgba(207, 136, 77, 0.1);
+            transition: all 0.3s ease;
+        }
+        .btn-outline-primary:hover {
+            background: var(--accent);
+            color: #0a0500;
+            box-shadow: 0 4px 18px var(--accent-glow);
+        }
+
+        /* === CARDS (glassmorphic) === */
+        .card {
+            background: rgba(10, 6, 2, 0.68) !important;
+            border: 1px solid rgba(207, 136, 77, 0.18) !important;
+            color: var(--text-primary) !important;
+            border-radius: 14px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.55);
+            backdrop-filter: blur(14px) saturate(1.3);
+            -webkit-backdrop-filter: blur(14px) saturate(1.3);
+        }
+        .card-header {
+            background: transparent !important;
+            border-bottom: 1px solid rgba(207, 136, 77, 0.12) !important;
+        }
+
+        /* === FORMS === */
+        .form-control, .form-select {
+            background: rgba(8, 5, 2, 0.65) !important;
+            border: 1px solid rgba(207, 136, 77, 0.22) !important;
+            color: #f0e8dc !important;
+            border-radius: 8px;
+        }
+        .form-control::placeholder { color: rgba(196, 173, 149, 0.55); }
+        .form-control:focus, .form-select:focus {
+            background: rgba(8, 5, 2, 0.8) !important;
+            color: #f0e8dc !important;
+            border-color: var(--accent) !important;
+            box-shadow: 0 0 0 0.2rem rgba(207, 136, 77, 0.28) !important;
+        }
+        .form-label { color: var(--text-secondary); font-weight: 500; }
+
+        /* === LIST GROUPS === */
+        .list-group-item {
+            background: rgba(10, 6, 2, 0.65) !important;
+            color: var(--text-primary) !important;
+            border-color: rgba(207, 136, 77, 0.14) !important;
+        }
+
+        .text-muted { color: var(--text-secondary) !important; }
+
+        /* === ACCORDIONS === */
+        .accordion-item {
+            background: rgba(10, 6, 2, 0.68) !important;
+            border: 1px solid rgba(207, 136, 77, 0.18);
+            color: var(--text-primary);
+        }
+        .accordion-button {
+            background: rgba(14, 9, 3, 0.8) !important;
+            color: var(--text-primary);
+        }
+        .accordion-button:not(.collapsed) {
+            background: rgba(20, 12, 4, 0.9) !important;
+            color: var(--accent);
+            box-shadow: inset 0 -1px 0 rgba(207,136,77,.12);
+        }
+
+        /* === TABLES === */
+        .table {
+            color: var(--text-primary);
+            border-color: rgba(207, 136, 77, 0.15);
+        }
+        .table th { color: var(--accent); font-weight: 600; }
+        .table-striped > tbody > tr:nth-of-type(odd) > * {
+            background: rgba(207, 136, 77, 0.05);
+            color: var(--text-primary);
+        }
+
+        /* === BADGES === */
+        .badge.bg-success, .badge.bg-primary { background: var(--accent) !important; color: #0a0500; }
+        .badge.bg-secondary { background: rgba(207,136,77,0.2) !important; color: var(--accent); }
+
+        /* === ALERTS === */
+        .alert {
+            background: rgba(10, 6, 2, 0.8) !important;
+            border: 1px solid rgba(207, 136, 77, 0.25) !important;
+            color: var(--text-primary) !important;
+            backdrop-filter: blur(8px);
+        }
+        .alert-danger {
+            border-color: rgba(220, 80, 60, 0.35) !important;
+        }
+
+        /* === PROGRESS BARS === */
+        .progress {
+            background: rgba(207, 136, 77, 0.12);
+            border-radius: 8px;
+        }
+        .progress-bar {
+            background: linear-gradient(90deg, #cf884d, #e8b070);
+        }
+
+        /* legacy compat */
+        .bg-glow {
+            position: absolute;
+            width: 300px; height: 300px;
+            background: var(--accent);
+            filter: blur(150px);
+            opacity: 0.1;
+            border-radius: 50%;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== IMPRESSIONIST ANIMATED BACKGROUND ===== -->
+<canvas id="paintBg"></canvas>
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'core:home' %}">synapse</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link" href="{% url 'core:products' %}">Products</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'core:solutions' %}">Solutions</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'core:resources' %}">Resources</a></li>
+            </ul>
+            <ul class="navbar-nav ms-auto align-items-center">
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'core:dashboard' %}">Dashboard</a>
+                    </li>
+                    <li class="nav-item ms-3">
+                        <span class="navbar-text" style="color: var(--text-secondary);">Hello, {{ user.username }}</span>
+                    </li>
+                    <li class="nav-item ms-3">
+                        <form method="post" action="{% url 'core:logout' %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm px-4 py-2" style="border-radius:20px; border:1px solid rgba(220,80,60,0.5); color:#e87060; background:rgba(220,80,60,0.1);">Logout</button>
+                        </form>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'core:login' %}">For Developers</a>
+                    </li>
+                    <li class="nav-item ms-3">
+                        <a class="btn btn-outline-primary px-4" style="border-radius:20px;" href="{% url 'core:register' %}">Request Demo</a>
+                    </li>
+                    <li class="nav-item ms-2">
+                        <a class="btn btn-primary px-4" style="border-radius:20px;" href="{% url 'core:register' %}">Sign Up</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content_container %}
+<div class="container mt-4 pt-5" style="padding-top: 100px !important;">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+    {% block content %}
+    {% endblock %}
+</div>
+{% endblock %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+/* ===== IMPRESSIONIST ANIMATED BACKGROUND =====
+   Inspired by the warm painterly GIF:
+   - Bottom zone: warm earthy browns (soil)
+   - Middle zone: olive/yellow-green foliage
+   - Top zone: muted teal-blue sky
+   - Animated: slow organic blob drift + color morphing + film grain
+*/
+(function () {
+    const canvas = document.getElementById('paintBg');
+    const ctx = canvas.getContext('2d');
+    let W, H;
+
+    function resize() {
+        W = canvas.width = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+        buildGrain();
+    }
+    window.addEventListener('resize', resize);
+
+    // ---- PALETTE: exact tones from the GIF ----
+    // Zone colors [r,g,b] — we keep them in vertical bands
+    const skyColors    = [[100,130,140],[85,115,120],[110,148,155],[130,160,165],[75,105,115]];
+    const foliageColors= [[75,95,45],[90,110,55],[65,88,38],[100,120,60],[55,80,35],[80,100,48],[95,115,58]];
+    const earthColors  = [[90,60,30],[75,50,22],[105,72,38],[65,44,20],[85,58,28],[110,78,42]];
+
+    function rndFrom(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
+
+    // ---- BLOBS ----
+    // Each blob has a vertical zone bias so they cluster realistically
+    const blobs = [];
+    function makeBlob(zoneMin, zoneMax, palette) {
+        return {
+            x: Math.random() * (W||1200),
+            y: zoneMin + Math.random() * (zoneMax - zoneMin),
+            vx: (Math.random()-.5)*0.18,
+            vy: (Math.random()-.5)*0.10,
+            r: 100 + Math.random()*220,
+            rx: 0.7 + Math.random()*1.1,
+            ry: 0.5 + Math.random()*0.9,
+            rot: Math.random()*Math.PI*2,
+            dRot: (Math.random()-.5)*0.0012,
+            col: rndFrom(palette),
+            tCol: rndFrom(palette),
+            t: 0,
+            dt: 0.0015 + Math.random()*0.002,
+            alpha: 0.3 + Math.random()*0.32,
+            pulse: Math.random()*Math.PI*2,
+            dp: 0.006 + Math.random()*0.008,
+            palette,
+            zoneMin, zoneMax
+        };
+    }
+
+    function initBlobs() {
+        blobs.length = 0;
+        const SH = H||800;
+        // Sky: top 35%
+        for (let i=0;i<10;i++) blobs.push(makeBlob(0, SH*0.38, skyColors));
+        // Foliage: 25–70%
+        for (let i=0;i<14;i++) blobs.push(makeBlob(SH*0.22, SH*0.72, foliageColors));
+        // Earth: bottom 40%
+        for (let i=0;i<10;i++) blobs.push(makeBlob(SH*0.55, SH, earthColors));
+    }
+
+    // ---- FILM GRAIN ----
+    let grainCanvas = document.createElement('canvas');
+    let gCtx = grainCanvas.getContext('2d');
+    function buildGrain() {
+        grainCanvas.width  = W;
+        grainCanvas.height = H;
+        refreshGrain();
+    }
+    function refreshGrain() {
+        const img = gCtx.createImageData(W, H);
+        const d   = img.data;
+        for (let i=0; i<d.length; i+=4) {
+            const n = Math.random()*28;
+            d[i]   = n;
+            d[i+1] = n*0.85;
+            d[i+2] = n*0.65;
+            d[i+3] = 20;
+        }
+        gCtx.putImageData(img, 0, 0);
+    }
+
+    // ---- UTILITIES ----
+    function lerp(a,b,t){ return a+(b-a)*t; }
+    function lerpC(c1,c2,t){ return [lerp(c1[0],c2[0],t),lerp(c1[1],c2[1],t),lerp(c1[2],c2[2],t)]; }
+
+    // ---- DRAW ----
+    let frame = 0;
+    function draw() {
+        ctx.clearRect(0,0,W,H);
+
+        // === BASE: layered horizontal gradient matching GIF zones ===
+        const baseGrad = ctx.createLinearGradient(0,0,0,H);
+        baseGrad.addColorStop(0.00, '#4a6870');   // sky teal
+        baseGrad.addColorStop(0.18, '#3d5a60');
+        baseGrad.addColorStop(0.35, '#4a6040');   // foliage transition
+        baseGrad.addColorStop(0.55, '#3d5230');   // mid green
+        baseGrad.addColorStop(0.70, '#5a4020');   // earth starts
+        baseGrad.addColorStop(0.85, '#6a4818');   // warm brown
+        baseGrad.addColorStop(1.00, '#4a3010');   // deep earth
+        ctx.fillStyle = baseGrad;
+        ctx.fillRect(0,0,W,H);
+
+        // === PAINTERLY BLOBS ===
+        blobs.forEach(b => {
+            // drift
+            b.x += b.vx; b.y += b.vy;
+            b.rot += b.dRot;
+            b.pulse += b.dp;
+            b.t += b.dt;
+
+            // bounce within zone
+            if (b.x < -b.r) b.x = W + b.r;
+            if (b.x > W+b.r) b.x = -b.r;
+            if (b.y < b.zoneMin - b.r*0.5) b.vy = Math.abs(b.vy)*0.6;
+            if (b.y > b.zoneMax + b.r*0.5) b.vy = -Math.abs(b.vy)*0.6;
+
+            // color morph
+            if (b.t >= 1) { b.col = b.tCol; b.tCol = rndFrom(b.palette); b.t = 0; }
+            const col = lerpC(b.col, b.tCol, b.t);
+            const rad = b.r * (1 + 0.12*Math.sin(b.pulse));
+
+            ctx.save();
+            ctx.translate(b.x, b.y);
+            ctx.rotate(b.rot);
+            ctx.scale(b.rx, b.ry);
+
+            const g = ctx.createRadialGradient(0,0,0, 0,0,rad);
+            g.addColorStop(0,   `rgba(${col[0]|0},${col[1]|0},${col[2]|0},${b.alpha})`);
+            g.addColorStop(0.55,`rgba(${col[0]|0},${col[1]|0},${col[2]|0},${b.alpha*0.45})`);
+            g.addColorStop(1,   `rgba(${col[0]|0},${col[1]|0},${col[2]|0},0)`);
+            ctx.fillStyle = g;
+            ctx.beginPath();
+            ctx.arc(0,0,rad,0,Math.PI*2);
+            ctx.fill();
+            ctx.restore();
+        });
+
+        // === PAINTERLY STROKES: horizontal smear lines ===
+        if (frame % 180 === 0) drawStrokes();
+
+        // === DARK VIGNETTE (edges) ===
+        const vig = ctx.createRadialGradient(W/2,H/2,H*0.18, W/2,H/2,H*0.88);
+        vig.addColorStop(0,'rgba(0,0,0,0)');
+        vig.addColorStop(1,'rgba(0,0,0,0.62)');
+        ctx.fillStyle = vig;
+        ctx.fillRect(0,0,W,H);
+
+        // === TOP DARK OVERLAY (make content readable) ===
+        // Only on non-home pages where content sits on top
+        const topOverlay = ctx.createLinearGradient(0,0,0,H*0.25);
+        topOverlay.addColorStop(0,'rgba(0,0,0,0.35)');
+        topOverlay.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.fillStyle = topOverlay;
+        ctx.fillRect(0,0,W,H*0.25);
+
+        // === FILM GRAIN ===
+        frame++;
+        if (frame % 2 === 0) refreshGrain();
+        ctx.drawImage(grainCanvas,0,0);
+
+        requestAnimationFrame(draw);
+    }
+
+    // Occasional brushstroke smears for more painterly feel
+    function drawStrokes() {
+        const numStrokes = 8 + Math.floor(Math.random()*12);
+        for (let i=0; i<numStrokes; i++) {
+            const sy = Math.random() * H;
+            const zoneIdx = sy/H;
+            let col;
+            if      (zoneIdx < 0.35) col = rndFrom(skyColors);
+            else if (zoneIdx < 0.65) col = rndFrom(foliageColors);
+            else                     col = rndFrom(earthColors);
+
+            const x1 = Math.random()*W;
+            const x2 = x1 + (Math.random()-.5)*W*0.4;
+            const alpha = 0.04 + Math.random()*0.08;
+            const thick = 4 + Math.random()*18;
+
+            ctx.strokeStyle = `rgba(${col[0]},${col[1]},${col[2]},${alpha})`;
+            ctx.lineWidth = thick;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(x1, sy);
+            ctx.bezierCurveTo(
+                x1 + (Math.random()-.5)*100, sy + (Math.random()-.5)*20,
+                x2 + (Math.random()-.5)*100, sy + (Math.random()-.5)*20,
+                x2, sy + (Math.random()-.5)*8
+            );
+            ctx.stroke();
+        }
+    }
+
+    // Boot
+    resize();
+    initBlobs();
+    draw();
+
+    window.addEventListener('resize', () => { initBlobs(); });
+})();
+</script>
+
+</body>
+</html>

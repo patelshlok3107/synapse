@@ -1,0 +1,855 @@
+{% extends 'base.html' %}
+
+{% block navbar %}
+<!-- Navbar hidden during loader, revealed after -->
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav" style="opacity: 0; transform: translateY(-100%); transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center" href="{% url 'core:home' %}" style="font-family: 'Yellowtail', cursive; font-size: 2.2rem; color: #ebd8c7; text-shadow: 2px 2px 0px #cf884d; margin-top: -5px;">
+            synapse
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link" href="#">Products</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Solutions</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Resources</a></li>
+            </ul>
+            <ul class="navbar-nav ms-auto align-items-center">
+                {% if user.is_authenticated %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'core:dashboard' %}">Dashboard</a></li>
+                    <li class="nav-item ms-3"><span class="navbar-text text-white">Hello, {{ user.username }}</span></li>
+                    <li class="nav-item ms-3">
+                        <form method="post" action="{% url 'core:logout' %}" class="d-inline">{% csrf_token %}
+                            <button type="submit" class="btn btn-outline-danger btn-sm px-4 py-2" style="border-radius: 20px;">Logout</button>
+                        </form>
+                    </li>
+                {% else %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'core:login' %}">Login</a></li>
+                    <li class="nav-item ms-3"><a class="btn btn-primary px-4" style="border-radius: 20px;" href="{% url 'core:register' %}">Sign Up</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content_container %}
+<style>
+/* ========== CINEMATIC CANVAS LOADER ========== */
+@import url('https://fonts.googleapis.com/css2?family=Yellowtail&display=swap');
+
+.loader-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 9999;
+    background: #1c110c; /* Dark chocolate brown */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: transform 1.2s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+.loader-overlay.done {
+    transform: translateY(-100%);
+    pointer-events: none;
+}
+
+#loaderCanvas {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 1;
+}
+
+.loader-progress-container {
+    position: absolute;
+    bottom: 15%;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.loader-percent {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #ebd8c7;
+    letter-spacing: 0.1em;
+}
+.loader-percent .num {
+    display: inline-block;
+    min-width: 3ch;
+    text-align: right;
+}
+
+.loader-progress-bar {
+    width: 200px;
+    height: 2px;
+    background: rgba(235, 216, 199, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.loader-progress-fill {
+    position: absolute;
+    top: 0; left: 0;
+    height: 100%;
+    width: 0%;
+    background: #ebd8c7;
+    box-shadow: 0 0 10px rgba(235, 216, 199, 0.5);
+}
+
+/* ========== LANDING PAGE ========== */
+.landing-page {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+.landing-page.visible {
+    opacity: 1;
+}
+
+/* Hero */
+.hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    padding-top: 80px;
+}
+
+.hero-bg-glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(150px);
+    z-index: 0;
+    pointer-events: none;
+}
+.glow-a { width: 500px; height: 500px; background: rgba(207,136,77,0.15); top: -100px; left: -100px; animation: driftA 15s infinite alternate ease-in-out; }
+.glow-b { width: 400px; height: 400px; background: rgba(207,136,77,0.1); bottom: -50px; right: -50px; animation: driftB 18s infinite alternate-reverse ease-in-out; }
+.glow-c { width: 200px; height: 200px; background: rgba(207,136,77,0.2); top: 40%; left: 50%; animation: driftC 12s infinite alternate ease-in-out; }
+
+@keyframes driftA { to { transform: translate(80px, 60px) scale(1.3); } }
+@keyframes driftB { to { transform: translate(-60px, -40px) scale(1.2); } }
+@keyframes driftC { to { transform: translate(-40px, 30px) scale(0.8); } }
+
+.hero-headline {
+    font-size: clamp(3rem, 7vw, 6rem);
+    font-weight: 700;
+    line-height: 1.05;
+    z-index: 2;
+    overflow: hidden;
+}
+
+.hero-headline .line {
+    display: block;
+    overflow: hidden;
+}
+
+.hero-headline .line-inner {
+    display: block;
+    transform: translateY(110%);
+    transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hero-headline .line-inner.reveal {
+    transform: translateY(0);
+}
+
+.hero-sub {
+    font-size: 1.25rem;
+    color: #888;
+    max-width: 550px;
+    margin: 2rem auto 3rem;
+    z-index: 2;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 1s 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hero-sub.reveal { opacity: 1; transform: translateY(0); }
+
+.hero-cta {
+    z-index: 2;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 1s 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hero-cta.reveal { opacity: 1; transform: translateY(0); }
+
+.btn-hero {
+    background: #cf884d;
+    color: #000;
+    font-weight: 700;
+    font-size: 1.1rem;
+    padding: 16px 48px;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 4px 25px rgba(207, 136, 77, 0.3);
+}
+.btn-hero:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 40px rgba(207, 136, 77, 0.5);
+    color: #000;
+}
+.btn-hero::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 0; height: 0;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    transition: width 0.6s, height 0.6s, top 0.6s, left 0.6s;
+}
+.btn-hero:hover::after {
+    width: 300px; height: 300px;
+    top: -100px; left: -100px;
+}
+
+/* Scroll indicator */
+.scroll-indicator {
+    position: absolute;
+    bottom: 40px;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+    animation: fadeInUp 1s 2s forwards;
+}
+.scroll-indicator span {
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #555;
+}
+.scroll-line {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, #cf884d, transparent);
+    animation: scrollPulse 2s infinite;
+}
+@keyframes scrollPulse {
+    0%, 100% { opacity: 0.3; transform: scaleY(0.5); }
+    50% { opacity: 1; transform: scaleY(1); }
+}
+@keyframes fadeInUp {
+    to { opacity: 1; }
+}
+
+/* ========== SECTIONS ========== */
+.section {
+    padding: 120px 0;
+    position: relative;
+}
+
+/* Scroll reveal */
+.sr {
+    opacity: 0;
+    transform: translateY(60px);
+    transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.sr.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+.sr-delay-1 { transition-delay: 0.15s; }
+.sr-delay-2 { transition-delay: 0.3s; }
+.sr-delay-3 { transition-delay: 0.45s; }
+
+/* Stats Section */
+.stats-section {
+    background: rgba(8, 5, 2, 0.55);
+    border-top: 1px solid rgba(207,136,77,0.15);
+    border-bottom: 1px solid rgba(207,136,77,0.15);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.stat-item {
+    text-align: center;
+    padding: 2rem;
+}
+.stat-number {
+    font-size: 4rem;
+    font-weight: 700;
+    color: #cf884d;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+.stat-label {
+    font-size: 0.9rem;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+}
+
+/* Feature Section */
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+}
+@media (max-width: 768px) {
+    .feature-grid { grid-template-columns: 1fr; }
+}
+
+.feature-card {
+    background: rgba(8, 5, 2, 0.62);
+    border: 1px solid rgba(207,136,77,0.18);
+    border-radius: 20px;
+    padding: 3rem 2rem;
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+.feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 3px;
+    background: linear-gradient(90deg, transparent, #cf884d, transparent);
+    opacity: 0;
+    transition: opacity 0.4s;
+}
+.feature-card:hover {
+    border-color: rgba(207,136,77,0.4);
+    transform: translateY(-8px);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.4), 0 0 30px rgba(207,136,77,0.08);
+}
+.feature-card:hover::before { opacity: 1; }
+
+.feature-icon {
+    width: 60px; height: 60px;
+    border-radius: 16px;
+    background: rgba(207,136,77,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+}
+
+.feature-card h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+.feature-card p {
+    color: #888;
+    line-height: 1.7;
+    font-size: 0.95rem;
+}
+
+/* Adventure Section */
+.adventure-card-v2 {
+    background: rgba(8, 5, 2, 0.62);
+    border: 1px solid rgba(207,136,77,0.18);
+    border-radius: 24px;
+    padding: 3rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.5s ease;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+.adventure-card-v2:hover {
+    border-color: rgba(207,136,77,0.45);
+    box-shadow: 0 0 60px rgba(207,136,77,0.12);
+}
+.adventure-card-v2 .card-number {
+    position: absolute;
+    top: 20px; right: 30px;
+    font-size: 6rem;
+    font-weight: 800;
+    color: rgba(255,255,255,0.03);
+    line-height: 1;
+}
+
+/* CTA Section */
+.cta-section {
+    text-align: center;
+    position: relative;
+}
+.cta-section .cta-glow {
+    position: absolute;
+    width: 400px; height: 400px;
+    background: rgba(207,136,77,0.15);
+    border-radius: 50%;
+    filter: blur(120px);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 0;
+}
+
+/* Marquee */
+.marquee-wrap {
+    overflow: hidden;
+    white-space: nowrap;
+    border-top: 1px solid #1a1a1a;
+    border-bottom: 1px solid #1a1a1a;
+    padding: 30px 0;
+}
+.marquee-track {
+    display: inline-block;
+    animation: marquee 20s linear infinite;
+}
+.marquee-track span {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #222;
+    margin: 0 60px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+.marquee-track span.green { color: #cf884d; }
+
+@keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+/* Footer */
+.site-footer {
+    padding: 60px 0 30px;
+    border-top: 1px solid rgba(207,136,77,0.15);
+    color: #b8a090;
+    font-size: 0.9rem;
+    background: rgba(5, 3, 1, 0.6);
+    backdrop-filter: blur(10px);
+}
+</style>
+
+<!-- =================== CINEMATIC CANVAS LOADER =================== -->
+<div class="loader-overlay" id="loader">
+    <canvas id="loaderCanvas"></canvas>
+    <div class="loader-progress-container">
+        <div class="loader-percent"><span class="num" id="loaderNum">0</span> %</div>
+        <div class="loader-progress-bar">
+            <div class="loader-progress-fill" id="loaderFill"></div>
+        </div>
+    </div>
+</div>
+
+<!-- =================== LANDING PAGE =================== -->
+<div class="landing-page" id="landingPage">
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-bg-glow glow-a"></div>
+        <div class="hero-bg-glow glow-b"></div>
+        <div class="hero-bg-glow glow-c"></div>
+
+        <h1 class="hero-headline">
+            <span class="line"><span class="line-inner" id="line1">Ace Every</span></span>
+            <span class="line"><span class="line-inner" id="line2">Interview With</span></span>
+            <span class="line"><span class="line-inner" id="line3" style="color: #cf884d; font-family: 'Caveat', cursive; font-size: 1.1em;">AI Precision</span></span>
+        </h1>
+
+        <p class="hero-sub" id="heroSub">
+            Upload your resume. Get AI-generated questions. Practice with voice. Receive instant, detailed feedback. Land the job.
+        </p>
+
+        <div class="hero-cta" id="heroCta">
+            <a href="{% url 'core:register' %}" class="btn-hero">Start Practicing Free →</a>
+        </div>
+
+    </section>
+
+    <!-- MARQUEE -->
+    <div class="marquee-wrap">
+        <div class="marquee-track">
+            <span>Resume Parsing</span>
+            <span class="green">✦</span>
+            <span>Mock Interviews</span>
+            <span class="green">✦</span>
+            <span>AI Feedback</span>
+            <span class="green">✦</span>
+            <span>Voice Recognition</span>
+            <span class="green">✦</span>
+            <span>Score Tracking</span>
+            <span class="green">✦</span>
+            <span>Resume Parsing</span>
+            <span class="green">✦</span>
+            <span>Mock Interviews</span>
+            <span class="green">✦</span>
+            <span>AI Feedback</span>
+            <span class="green">✦</span>
+            <span>Voice Recognition</span>
+            <span class="green">✦</span>
+            <span>Score Tracking</span>
+            <span class="green">✦</span>
+        </div>
+    </div>
+
+    <!-- STATS -->
+    <section class="section stats-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3 col-6 sr"><div class="stat-item"><div class="stat-number" data-target="10000">0</div><div class="stat-label">Mock Interviews</div></div></div>
+                <div class="col-md-3 col-6 sr sr-delay-1"><div class="stat-item"><div class="stat-number" data-target="95">0</div><div class="stat-label">Accuracy Rate %</div></div></div>
+                <div class="col-md-3 col-6 sr sr-delay-2"><div class="stat-item"><div class="stat-number" data-target="50">0</div><div class="stat-label">Question Types</div></div></div>
+                <div class="col-md-3 col-6 sr sr-delay-3"><div class="stat-item"><div class="stat-number" data-target="5000">0</div><div class="stat-label">Happy Users</div></div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="section">
+        <div class="container">
+            <div class="text-center mb-5 sr">
+                <h2 style="font-size: 3rem; font-weight: 700;">How It <span style="color: #cf884d; font-family: 'Caveat', cursive; font-size: 1.2em;">Works</span></h2>
+                <p class="text-secondary mt-3" style="max-width: 500px; margin: 0 auto;">Three simple steps to transform your interview preparation forever.</p>
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card sr">
+                    <div class="feature-icon">📄</div>
+                    <h3>Upload Your Resume</h3>
+                    <p>Our AI parses your resume in seconds — extracting skills, experience, education, and projects to build your profile.</p>
+                </div>
+                <div class="feature-card sr sr-delay-1">
+                    <div class="feature-icon">🎯</div>
+                    <h3>AI Mock Interview</h3>
+                    <p>Get personalized interview questions generated from your resume. Choose Technical, Behavioral, HR, or Project-based rounds.</p>
+                </div>
+                <div class="feature-card sr sr-delay-2">
+                    <div class="feature-icon">📊</div>
+                    <h3>Instant AI Feedback</h3>
+                    <p>Receive detailed scoring on technical accuracy, communication, relevance, grammar and confidence — with actionable tips.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ADVENTURE / CTA CARDS -->
+    <section class="section">
+        <div class="container">
+            <div class="text-center mb-5 sr">
+                <h2 style="font-size: 3rem; font-weight: 700;">Choose Your <span style="color: #cf884d; font-family: 'Caveat', cursive; font-size: 1.2em;">Path</span></h2>
+            </div>
+            <div class="row g-4 justify-content-center">
+                <div class="col-md-5 sr">
+                    <div class="adventure-card-v2">
+                        <div class="card-number">01</div>
+                        <h3 class="mb-3" style="font-size: 1.5rem; font-weight: 700;">For Students</h3>
+                        <p class="text-secondary mb-4">Prepare for campus placements with AI-powered mock interviews tailored to your resume and skill level.</p>
+                        <ul class="list-unstyled text-secondary mb-4" style="line-height: 2.2;">
+                            <li>✓ Resume-based question generation</li>
+                            <li>✓ Voice-to-text answer recording</li>
+                            <li>✓ 5-dimension scoring system</li>
+                        </ul>
+                        <a href="{% url 'core:register' %}" class="btn-hero" style="padding: 12px 32px; font-size: 0.95rem;">Get Started Free</a>
+                    </div>
+                </div>
+                <div class="col-md-5 sr sr-delay-1">
+                    <div class="adventure-card-v2">
+                        <div class="card-number">02</div>
+                        <h3 class="mb-3" style="font-size: 1.5rem; font-weight: 700;">For Professionals</h3>
+                        <p class="text-secondary mb-4">Sharpen your skills for senior roles. Practice system design, leadership, and behavioral rounds with precision.</p>
+                        <ul class="list-unstyled text-secondary mb-4" style="line-height: 2.2;">
+                            <li>✓ Advanced technical deep-dives</li>
+                            <li>✓ Behavioral & situational rounds</li>
+                            <li>✓ Performance analytics dashboard</li>
+                        </ul>
+                        <a href="{% url 'core:register' %}" class="btn-hero" style="padding: 12px 32px; font-size: 0.95rem; background: transparent; border: 2px solid #cf884d; color: #cf884d;">Explore Pro</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FINAL CTA -->
+    <section class="section cta-section">
+        <div class="cta-glow"></div>
+        <div class="container position-relative" style="z-index: 2;">
+            <div class="sr">
+                <h2 style="font-size: clamp(2rem, 5vw, 4rem); font-weight: 700; margin-bottom: 1.5rem;">
+                    Ready to ace your<br><span style="color: #cf884d; font-family: 'Caveat', cursive; font-size: 1.2em;">next interview?</span>
+                </h2>
+                <p class="text-secondary mb-5" style="max-width: 500px; margin: 0 auto 3rem;">Join thousands of students who transformed their interview performance with AI-powered practice.</p>
+                <a href="{% url 'core:register' %}" class="btn-hero">Create Free Account →</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+        <div class="container text-center">
+            <p class="mb-1">
+                <span style="font-family: 'Yellowtail', cursive; font-size: 1.5rem; color: #ebd8c7;">synapse</span>
+            </p>
+            <p class="mb-2" style="font-family: 'Yellowtail', cursive; font-size: 0.95rem; color: rgba(207,136,77,0.65); letter-spacing: 0.04em;">shlokk.patel</p>
+            <p style="color: #666; font-size: 0.8rem;">&copy; 2026 All rights reserved.</p>
+        </div>
+    </footer>
+
+</div>
+
+<!-- =================== SCRIPTS =================== -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    // ===== CINEMATIC CANVAS LOADER =====
+    const loader = document.getElementById('loader');
+    const landing = document.getElementById('landingPage');
+    const nav = document.getElementById('mainNav');
+    
+    const canvas = document.getElementById('loaderCanvas');
+    const ctx = canvas.getContext('2d');
+    let w, h;
+    function resize() {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+    
+    const particles = [];
+    const numParticles = 120;
+    for(let i=0; i<numParticles; i++) {
+        particles.push({
+            x: Math.random() * w,
+            y: Math.random() * h,
+            vx: (Math.random() - 0.5) * 1.5,
+            vy: (Math.random() - 0.5) * 1.5,
+            radius: Math.random() * 2 + 0.5,
+            alpha: Math.random(),
+            pulse: Math.random() * Math.PI * 2
+        });
+    }
+    
+    let progress = 0;
+    const duration = 7500; // 7.5 seconds for cinematic feel
+    const startTime = performance.now();
+    
+    function drawText(clipWidthRatio) {
+        ctx.save();
+        
+        // Calculate dynamic font size based on viewport
+        let baseFontSize = Math.min(Math.max(w * 0.1, 60), 150);
+        ctx.font = `${baseFontSize}px 'Yellowtail', cursive`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        
+        const text = "synapse";
+        const textW = ctx.measureText(text).width;
+        
+        // Clipping region to reveal text left-to-right
+        if (clipWidthRatio < 1) {
+            ctx.beginPath();
+            ctx.rect(w/2 - textW/2 - 40, h/2 - 150, textW * clipWidthRatio + 40, 300);
+            ctx.clip();
+        }
+        
+        // Warm halo behind logo
+        if (clipWidthRatio > 0) {
+            ctx.shadowColor = "rgba(207, 136, 77, 0.4)";
+            ctx.shadowBlur = 40;
+            ctx.fillText(text, w/2, h/2);
+        }
+        
+        // 3D Shadow layer
+        ctx.fillStyle = "#cf884d";
+        ctx.shadowColor = "#cf884d";
+        ctx.shadowBlur = 10;
+        ctx.fillText(text, w/2 + 4, h/2 + 4);
+        
+        // Ivory foreground layer
+        ctx.fillStyle = "#ebd8c7";
+        ctx.shadowBlur = 0;
+        ctx.fillText(text, w/2, h/2);
+        
+        ctx.restore();
+        return w/2 - textW/2 + textW * clipWidthRatio; // Leading edge X
+    }
+    
+    function animate(time) {
+        let elapsed = time - startTime;
+        progress = Math.min((elapsed / duration) * 100, 100);
+        
+        ctx.clearRect(0, 0, w, h);
+        
+        // Update particles
+        ctx.lineWidth = 0.8;
+        for(let i=0; i<particles.length; i++) {
+            let p = particles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+            p.pulse += 0.05;
+            
+            if(p.x < 0) p.x = w;
+            if(p.x > w) p.x = 0;
+            if(p.y < 0) p.y = h;
+            if(p.y > h) p.y = 0;
+            
+            // Frame 1-4: Neural network lines
+            if (progress < 40) {
+                for(let j=i+1; j<particles.length; j++) {
+                    let p2 = particles[j];
+                    let dx = p.x - p2.x;
+                    let dy = p.y - p2.y;
+                    let dist = Math.sqrt(dx*dx + dy*dy);
+                    if (dist < 100) {
+                        let opacity = 0.4 * (1 - dist/100) * (1 - Math.max(0, (progress-30)/10));
+                        ctx.strokeStyle = `rgba(207, 136, 77, ${opacity})`;
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            
+            // Frame 5: Network collapse
+            if (progress >= 30 && progress < 50) {
+                let dx = w/2 - p.x;
+                let dy = h/2 - p.y;
+                p.vx += dx * 0.0008;
+                p.vy += dy * 0.0008;
+                p.vx *= 0.98; // Friction
+                p.vy *= 0.98;
+            }
+            
+            // Frame 9-10: Settle and fade
+            let pAlpha = p.alpha * (0.5 + 0.5 * Math.sin(p.pulse));
+            if (progress >= 80) {
+                pAlpha *= Math.max(0, 1 - (progress - 80)/15);
+            }
+            
+            if (pAlpha > 0) {
+                ctx.fillStyle = `rgba(235, 216, 199, ${pAlpha})`;
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = "#cf884d";
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI*2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+        }
+        
+        // Frames 6-10: Logo drawing
+        if (progress >= 40) {
+            // Easing function for smooth calligraphy reveal
+            let t = Math.min((progress - 40) / 40, 1); // 40 to 80
+            let ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+            
+            let leadingX = drawText(ease);
+            
+            // Frame 8: Golden sparks burst from writing tip
+            if (ease < 1 && Math.random() < 0.4 && progress < 80) {
+                particles.push({
+                    x: leadingX,
+                    y: h/2 + (Math.random()-0.5)*80,
+                    vx: (Math.random()-0.5)*3 - 1, // drift left
+                    vy: (Math.random()-0.5)*4,
+                    radius: Math.random()*2 + 1,
+                    alpha: 1,
+                    pulse: 0
+                });
+            }
+        }
+        
+        // Frame 11: Metallic Shine Sweep
+        if (progress >= 85 && progress < 95) {
+            let shineP = (progress - 85) / 10;
+            ctx.save();
+            ctx.globalCompositeOperation = 'source-atop';
+            let grad = ctx.createLinearGradient(w/2 - 300 + shineP*600, 0, w/2 - 200 + shineP*600, 0);
+            grad.addColorStop(0, "rgba(255,255,255,0)");
+            grad.addColorStop(0.5, "rgba(255,255,255,0.7)");
+            grad.addColorStop(1, "rgba(255,255,255,0)");
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+            ctx.restore();
+        }
+        
+        document.getElementById('loaderNum').textContent = Math.floor(progress);
+        document.getElementById('loaderFill').style.width = progress + '%';
+        
+        if (progress < 100) {
+            requestAnimationFrame(animate);
+        } else {
+            // End of loading animation
+            setTimeout(() => {
+                loader.classList.add('done');
+                landing.classList.add('visible');
+                
+                setTimeout(() => { document.getElementById('line1').classList.add('reveal'); }, 400);
+                setTimeout(() => { document.getElementById('line2').classList.add('reveal'); }, 600);
+                setTimeout(() => { document.getElementById('line3').classList.add('reveal'); }, 800);
+                setTimeout(() => { document.getElementById('heroSub').classList.add('reveal'); }, 1000);
+                setTimeout(() => { document.getElementById('heroCta').classList.add('reveal'); }, 1200);
+                
+                setTimeout(() => {
+                    nav.style.opacity = '1';
+                    nav.style.transform = 'translateY(0)';
+                }, 1300);
+                
+                setTimeout(() => { loader.style.display = 'none'; }, 1500);
+                
+            }, 500);
+        }
+    }
+    
+    // Start animation when font is ready
+    if (document.fonts) {
+        document.fonts.ready.then(() => {
+            requestAnimationFrame(animate);
+        });
+    } else {
+        setTimeout(() => requestAnimationFrame(animate), 500);
+    }
+
+    // ===== SCROLL REVEAL =====
+    const srElements = document.querySelectorAll('.sr');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.15 });
+
+    srElements.forEach(el => observer.observe(el));
+
+    // ===== STAT COUNTER ANIMATION =====
+    const statNumbers = document.querySelectorAll('.stat-number[data-target]');
+    const statObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const el = entry.target;
+                const target = parseInt(el.getAttribute('data-target'));
+                let current = 0;
+                const increment = target / 60;
+                const statTimer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        current = target;
+                        clearInterval(statTimer);
+                    }
+                    el.textContent = Math.floor(current).toLocaleString() + (el.closest('.stat-item').querySelector('.stat-label').textContent.includes('%') ? '%' : '+');
+                }, 25);
+                statObserver.unobserve(el);
+            }
+        });
+    }, { threshold: 0.5 });
+
+    statNumbers.forEach(el => statObserver.observe(el));
+});
+</script>
+{% endblock %}

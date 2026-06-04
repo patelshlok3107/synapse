@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5 text-center">
+    <h1 style="font-size: 3rem; font-weight: 700; margin-bottom: 1.5rem;">
+        Tailored <span style="color: var(--neon-green); font-family: 'Caveat', cursive;">Solutions</span>
+    </h1>
+    <p class="text-secondary mb-5" style="max-width: 600px; margin: 0 auto;">Whether you're an individual or an enterprise, we have the right solution for you.</p>
+    
+    <div class="row g-4 justify-content-center">
+        <div class="col-md-5">
+            <div class="card h-100" style="background: #111; border: 1px solid #222; border-radius: 20px; transition: transform 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-10px)'; this.style.borderColor='var(--neon-green)';" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='#222';">
+                <div class="card-body p-5">
+                    <h3 class="card-title text-white mb-3">For Individuals</h3>
+                    <p class="card-text text-secondary mb-4">Land your dream job with personalized mock interviews and detailed feedback.</p>
+                    <ul class="list-unstyled text-start text-secondary mx-auto" style="max-width: 250px;">
+                        <li class="mb-2">✓ Unlimited mock interviews</li>
+                        <li class="mb-2">✓ Comprehensive feedback</li>
+                        <li class="mb-2">✓ Progress tracking</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div class="card h-100" style="background: #111; border: 1px solid #222; border-radius: 20px; transition: transform 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-10px)'; this.style.borderColor='var(--neon-green)';" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='#222';">
+                <div class="card-body p-5">
+                    <h3 class="card-title text-white mb-3">For Enterprise</h3>
+                    <p class="card-text text-secondary mb-4">Screen candidates efficiently and upskill your existing workforce.</p>
+                    <ul class="list-unstyled text-start text-secondary mx-auto" style="max-width: 250px;">
+                        <li class="mb-2">✓ Custom interview templates</li>
+                        <li class="mb-2">✓ Team analytics dashboard</li>
+                        <li class="mb-2">✓ API integrations</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

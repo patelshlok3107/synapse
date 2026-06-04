@@ -1,0 +1,246 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+    }
+    .recording {
+        animation: pulse 1.5s infinite;
+    }
+    .accordion-item {
+        background: rgba(255, 255, 255, 0.5);
+        backdrop-filter: blur(5px);
+    }
+</style>
+<div class="card p-4 shadow-sm border-0 mb-5 glass">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>{{ interview.interview_type }} Interview</h2>
+        <span class="badge bg-secondary" id="interviewStatus">Status: {{ interview.status }}</span>
+    </div>
+    
+    <p class="text-muted">Read the question and provide your answer. You can type it out or use the microphone to speak your answer. Submit to get instant AI feedback.</p>
+    
+    <div class="accordion" id="questionsAccordion">
+        {% for question in questions %}
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="heading{{ question.id }}">
+                <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ question.id }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="collapse{{ question.id }}">
+                    <strong>Question {{ question.order }}:</strong>&nbsp; <span class="text-truncate" style="max-width: 400px;">{{ question.text }}</span>
+                </button>
+            </h2>
+            <div id="collapse{{ question.id }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" aria-labelledby="heading{{ question.id }}" data-bs-parent="#questionsAccordion">
+                <div class="accordion-body">
+                    <p class="fs-5 mb-4">{{ question.text }}</p>
+                    
+                    <div class="mb-3 position-relative">
+                        <textarea class="form-control" id="answer-{{ question.id }}" rows="5" placeholder="Type your answer here or use voice recording..."></textarea>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <button class="btn btn-outline-danger btn-voice" data-qid="{{ question.id }}">
+                            🎤 Start Recording
+                        </button>
+                        <button class="btn btn-primary btn-submit" data-qid="{{ question.id }}">
+                            Submit Answer
+                        </button>
+                    </div>
+                    
+                    <!-- Feedback Container -->
+                    <div id="feedback-{{ question.id }}" class="mt-4 d-none">
+                        <hr style="border-color: #333;">
+                        <h5 style="color: var(--neon-green);">AI Feedback</h5>
+                        <div class="row text-center mb-3">
+                            <div class="col"><div class="p-2 border rounded" style="background: #1a1a1a; border-color: #333 !important;"><strong>Overall</strong><br><span class="fs-4" id="score-overall-{{ question.id }}">-</span>/100</div></div>
+                            <div class="col"><div class="p-2 border rounded" style="background: #1a1a1a; border-color: #333 !important;"><strong>Tech</strong><br><span class="fs-4" id="score-tech-{{ question.id }}">-</span>/100</div></div>
+                            <div class="col"><div class="p-2 border rounded" style="background: #1a1a1a; border-color: #333 !important;"><strong>Comms</strong><br><span class="fs-4" id="score-comm-{{ question.id }}">-</span>/100</div></div>
+                        </div>
+                        <div class="alert alert-dark border-secondary text-white" style="background: #111;" id="feedback-text-{{ question.id }}"></div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="d-grid mt-4">
+        <a href="{% url 'core:dashboard' %}" class="btn btn-outline-secondary">Save & Exit</a>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let isRecording = false;
+    let currentQid = null;
+    
+    // Request microphone access early if possible, or on click
+    
+    document.querySelectorAll('.btn-voice').forEach(btn => {
+        btn.addEventListener('click', async function() {
+            const qid = this.getAttribute('data-qid');
+            
+            if (isRecording && currentQid === qid) {
+                // Stop recording
+                if (mediaRecorder && mediaRecorder.state !== "inactive") {
+                    mediaRecorder.stop();
+                }
+                this.innerHTML = '🎤 Start Recording';
+                this.classList.remove('btn-danger', 'recording');
+                this.classList.add('btn-outline-danger');
+                isRecording = false;
+                currentQid = null;
+            } else {
+                // Start recording
+                if (isRecording && mediaRecorder) {
+                    mediaRecorder.stop(); // stop previous
+                }
+                
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
+                    
+                    mediaRecorder.ondataavailable = e => {
+                        if (e.data.size > 0) audioChunks.push(e.data);
+                    };
+                    
+                    mediaRecorder.onstop = () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                        
+                        // Show loading state in textarea
+                        const textarea = document.getElementById('answer-' + qid);
+                        const oldVal = textarea.value;
+                        textarea.value = (oldVal ? oldVal + ' ' : '') + "[Transcribing audio... Please wait]";
+                        
+                        const formData = new FormData();
+                        formData.append('audio', audioBlob, 'recording.webm');
+                        
+                        fetch('/interview/audio/upload/', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': getCookie('csrftoken')
+                            },
+                            body: formData
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                textarea.value = (oldVal ? oldVal + ' ' : '') + data.text;
+                            } else {
+                                textarea.value = oldVal;
+                                alert("Transcription failed: " + data.error);
+                            }
+                        })
+                        .catch(err => {
+                            textarea.value = oldVal;
+                            alert("Failed to upload audio.");
+                        });
+                        
+                        // Stop all tracks to release mic
+                        stream.getTracks().forEach(track => track.stop());
+                    };
+                    
+                    currentQid = qid;
+                    isRecording = true;
+                    
+                    // reset button states
+                    document.querySelectorAll('.btn-voice').forEach(b => {
+                        b.innerHTML = '🎤 Start Recording';
+                        b.classList.remove('btn-danger', 'recording');
+                        b.classList.add('btn-outline-danger');
+                    });
+                    
+                    this.innerHTML = '⏹ Stop Recording';
+                    this.classList.remove('btn-outline-danger');
+                    this.classList.add('btn-danger', 'recording');
+                    
+                    mediaRecorder.start();
+                    
+                } catch (err) {
+                    alert("Microphone access denied or not supported.");
+                    console.error(err);
+                }
+            }
+        });
+    });
+    
+    // Submit Answer
+    document.querySelectorAll('.btn-submit').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const qid = this.getAttribute('data-qid');
+            const answer = document.getElementById('answer-' + qid).value;
+            
+            if (!answer.trim()) {
+                alert("Please provide an answer before submitting.");
+                return;
+            }
+            
+            const originalText = this.innerHTML;
+            this.innerHTML = 'Evaluating...';
+            this.disabled = true;
+            
+            fetch(`/interview/question/${qid}/submit/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ answer_text: answer })
+            })
+            .then(response => response.json())
+            .then(data => {
+                this.innerHTML = 'Submitted';
+                this.classList.replace('btn-primary', 'btn-success');
+                
+                if (data.success) {
+                    // Show feedback
+                    const fbContainer = document.getElementById('feedback-' + qid);
+                    fbContainer.classList.remove('d-none');
+                    
+                    document.getElementById('score-overall-' + qid).innerText = data.evaluation.overall_score;
+                    document.getElementById('score-tech-' + qid).innerText = data.evaluation.technical_score;
+                    document.getElementById('score-comm-' + qid).innerText = data.evaluation.communication_score;
+                    document.getElementById('feedback-text-' + qid).innerText = data.evaluation.feedback;
+                    
+                    if (data.is_complete) {
+                        document.getElementById('interviewStatus').innerText = 'Status: Completed';
+                        alert("Congratulations! You have completed all questions in this interview.");
+                    }
+                } else {
+                    alert("Error: " + data.error);
+                    this.innerHTML = originalText;
+                    this.disabled = false;
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert("Failed to submit answer.");
+                this.innerHTML = originalText;
+                this.disabled = false;
+            });
+        });
+    });
+    
+    // Helper for CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+</script>
+{% endblock %}

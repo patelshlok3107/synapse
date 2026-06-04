@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5 text-center">
+    <h1 style="font-size: 3rem; font-weight: 700; margin-bottom: 1.5rem;">
+        Our <span style="color: var(--neon-green); font-family: 'Caveat', cursive;">Products</span>
+    </h1>
+    <p class="text-secondary mb-5" style="max-width: 600px; margin: 0 auto;">Discover the tools we offer to supercharge your interview preparation.</p>
+    
+    <div class="row g-4 justify-content-center">
+        <div class="col-md-4">
+            <div class="card h-100" style="background: #111; border: 1px solid #222; border-radius: 20px;">
+                <div class="card-body p-4">
+                    <h3 class="card-title text-white mb-3">AI Interviewer</h3>
+                    <p class="card-text text-secondary">Practice with our advanced AI that conducts mock interviews tailored to your resume.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100" style="background: #111; border: 1px solid #222; border-radius: 20px;">
+                <div class="card-body p-4">
+                    <h3 class="card-title text-white mb-3">Resume Analyzer</h3>
+                    <p class="card-text text-secondary">Get instant feedback on your resume and optimize it for ATS systems.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100" style="background: #111; border: 1px solid #222; border-radius: 20px;">
+                <div class="card-body p-4">
+                    <h3 class="card-title text-white mb-3">Performance Analytics</h3>
+                    <p class="card-text text-secondary">Track your progress over time with detailed metrics and actionable insights.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

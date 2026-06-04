@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="mb-4">
+    <a href="{% url 'core:dashboard' %}" class="btn btn-outline-secondary">&larr; Back to Dashboard</a>
+</div>
+
+<div class="card p-4">
+    <h2 class="mb-4">Resume Details</h2>
+    <p><strong>Uploaded File:</strong> <a href="{{ resume.file.url }}" target="_blank">View File</a></p>
+    <p class="text-muted">Uploaded on: {{ resume.uploaded_at|date:"F d, Y" }}</p>
+
+    <h4 class="mt-4 border-bottom pb-2">Parsed Information</h4>
+    
+    <div class="row mt-3">
+        <div class="col-md-6 mb-3">
+            <div class="card h-100" style="background: #161616;">
+                <div class="card-body">
+                    <h5 class="card-title text-white">Skills</h5>
+                    <p class="card-text text-secondary">{{ resume.parsed_skills|default:"Not found" }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-3">
+            <div class="card h-100" style="background: #161616;">
+                <div class="card-body">
+                    <h5 class="card-title text-white">Education</h5>
+                    <p class="card-text text-secondary">{{ resume.parsed_education|default:"Not found" }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-3">
+            <div class="card h-100" style="background: #161616;">
+                <div class="card-body">
+                    <h5 class="card-title text-white">Experience</h5>
+                    <p class="card-text text-secondary">{{ resume.parsed_experience|default:"Not found" }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-3">
+            <div class="card h-100" style="background: #161616;">
+                <div class="card-body">
+                    <h5 class="card-title text-white">Projects</h5>
+                    <p class="card-text text-secondary">{{ resume.parsed_projects|default:"Not found" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-grid mt-4">
+        <a href="{% url 'core:start_interview' %}" class="btn btn-success btn-lg">Generate Mock Interview</a>
+    </div>
+</div>
+{% endblock %}

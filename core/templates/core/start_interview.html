@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card p-4 mt-5">
+            <h2 class="text-center mb-4">Start Mock Interview</h2>
+            <p class="text-muted text-center mb-4">Select your parsed resume and the type of interview you want to practice. Our AI will generate 5 targeted questions.</p>
+            
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label">Select Resume (Optional)</label>
+                    <select name="resume_id" class="form-select">
+                        <option value="">-- No Resume (General Questions) --</option>
+                        {% for resume in resumes %}
+                            <option value="{{ resume.id }}">Resume uploaded {{ resume.uploaded_at|date:"F d, Y" }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Interview Type</label>
+                    <select name="interview_type" class="form-select" required>
+                        {% for value, label in types %}
+                            <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="d-grid mt-4">
+                    <button type="submit" class="btn btn-success btn-lg">Generate Questions</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5 text-center">
+    <h1 style="font-size: 3rem; font-weight: 700; margin-bottom: 1.5rem;">
+        Helpful <span style="color: var(--neon-green); font-family: 'Caveat', cursive;">Resources</span>
+    </h1>
+    <p class="text-secondary mb-5" style="max-width: 600px; margin: 0 auto;">Articles, guides, and tips to help you succeed in your career.</p>
+    
+    <div class="row g-4 justify-content-center text-start">
+        <div class="col-md-4">
+            <div class="card h-100" style="background: #111; border: 1px solid #222; border-radius: 20px;">
+                <div class="card-body p-4">
+                    <span class="badge bg-secondary mb-3 text-dark">Guide</span>
+                    <h4 class="card-title text-white mb-3">Mastering the Behavioral Interview</h4>
+                    <p class="card-text text-secondary">Learn the STAR method and how to effectively communicate your past experiences.</p>
+                    <a href="#" class="text-decoration-none" style="color: var(--neon-green);">Read more →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100" style="background: #111; border: 1px solid #222; border-radius: 20px;">
+                <div class="card-body p-4">
+                    <span class="badge bg-secondary mb-3 text-dark">Article</span>
+                    <h4 class="card-title text-white mb-3">Top 50 System Design Questions</h4>
+                    <p class="card-text text-secondary">A comprehensive list of system design questions asked at top tech companies.</p>
+                    <a href="#" class="text-decoration-none" style="color: var(--neon-green);">Read more →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100" style="background: #111; border: 1px solid #222; border-radius: 20px;">
+                <div class="card-body p-4">
+                    <span class="badge bg-secondary mb-3 text-dark">Template</span>
+                    <h4 class="card-title text-white mb-3">The Perfect Resume Template</h4>
+                    <p class="card-text text-secondary">Download our ATS-friendly resume template to ensure you get past the filters.</p>
+                    <a href="#" class="text-decoration-none" style="color: var(--neon-green);">Download ↓</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
