@@ -28,6 +28,12 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://synapse-w826.onrender.com',
+    'https://*.onrender.com',
+]
+
+
 
 # Application definition
 
