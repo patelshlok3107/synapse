@@ -171,27 +171,6 @@
             
             <button type="submit" class="btn btn-primary w-100 py-2" style="border-radius: 8px;">Sign in</button>
         </form>
-        {% load socialaccount %}
-        <div style="display:flex; align-items:center; gap:12px; margin: 20px 0 10px;">
-            <div style="flex:1; height:1px; background:rgba(255,255,255,0.15);"></div>
-            <span style="font-size:0.78em; color:#888; white-space:nowrap;">or continue with</span>
-            <div style="flex:1; height:1px; background:rgba(255,255,255,0.15);"></div>
-        </div>
-        <div style="display:flex; justify-content:center; align-items:center; gap:16px; margin-bottom:8px;">
-            <a href="{% provider_login_url 'google' %}" title="Sign in with Google"
-               style="display:flex; align-items:center; gap:8px; padding:10px 20px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); border-radius:10px; text-decoration:none; color:#fff; font-size:0.88em; font-weight:500; transition:all 0.25s ease;"
-               onmouseover="this.style.background='rgba(255,255,255,0.16)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="G" style="width:18px;height:18px;">
-                Google
-            </a>
-            <a href="{% provider_login_url 'github' %}" title="Sign in with GitHub"
-               style="display:flex; align-items:center; gap:8px; padding:10px 20px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); border-radius:10px; text-decoration:none; color:#fff; font-size:0.88em; font-weight:500; transition:all 0.25s ease;"
-               onmouseover="this.style.background='rgba(255,255,255,0.16)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">
-                <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="Git" style="width:18px;height:18px;filter:invert(1);">
-                GitHub
-            </a>
-        </div>
-        
         <div class="text-center mt-5">
             <a href="{% url 'core:register' %}" class="text-white text-decoration-none" style="font-size: 0.85em; text-decoration: underline !important;">Create an account</a>
         </div>
