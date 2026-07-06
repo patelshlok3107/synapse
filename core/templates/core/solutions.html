@@ -1,37 +1,45 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<style>
+    .check-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.6rem;
+        margin-bottom: 0.6rem;
+    }
+    .check-list svg {
+        color: var(--accent);
+        flex-shrink: 0;
+        margin-top: 3px;
+    }
+</style>
 <div class="container py-5 text-center">
-    <h1 style="font-size: 3rem; font-weight: 700; margin-bottom: 1.5rem;">
-        Tailored <span style="color: var(--neon-green); font-family: 'Caveat', cursive;">Solutions</span>
-    </h1>
-    <p class="text-secondary mb-5" style="max-width: 600px; margin: 0 auto;">Whether you're an individual or an enterprise, we have the right solution for you.</p>
-    
+    <span class="eyebrow">Solutions</span>
+    <h1 class="page-title mb-3">Tailored <span class="cursive">Solutions</span></h1>
+    <p class="text-secondary mb-5 mx-auto text-pretty" style="max-width: 600px;">Whether you&apos;re an individual or an enterprise, we have the right solution for you.</p>
+
     <div class="row g-4 justify-content-center">
         <div class="col-md-5">
-            <div class="card h-100" style="background: #111; border: 1px solid #222; border-radius: 20px; transition: transform 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-10px)'; this.style.borderColor='var(--neon-green)';" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='#222';">
-                <div class="card-body p-5">
-                    <h3 class="card-title text-white mb-3">For Individuals</h3>
-                    <p class="card-text text-secondary mb-4">Land your dream job with personalized mock interviews and detailed feedback.</p>
-                    <ul class="list-unstyled text-start text-secondary mx-auto" style="max-width: 250px;">
-                        <li class="mb-2">✓ Unlimited mock interviews</li>
-                        <li class="mb-2">✓ Comprehensive feedback</li>
-                        <li class="mb-2">✓ Progress tracking</li>
-                    </ul>
-                </div>
+            <div class="glass-panel hover-lift h-100 p-5 text-start">
+                <h3 class="mb-3" style="font-weight: 600;">For Individuals</h3>
+                <p class="text-secondary mb-4" style="line-height: 1.6;">Land your dream job with personalized mock interviews and detailed feedback.</p>
+                <ul class="list-unstyled check-list text-secondary mb-0">
+                    <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Unlimited mock interviews</li>
+                    <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Comprehensive feedback</li>
+                    <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Progress tracking</li>
+                </ul>
             </div>
         </div>
         <div class="col-md-5">
-            <div class="card h-100" style="background: #111; border: 1px solid #222; border-radius: 20px; transition: transform 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-10px)'; this.style.borderColor='var(--neon-green)';" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='#222';">
-                <div class="card-body p-5">
-                    <h3 class="card-title text-white mb-3">For Enterprise</h3>
-                    <p class="card-text text-secondary mb-4">Screen candidates efficiently and upskill your existing workforce.</p>
-                    <ul class="list-unstyled text-start text-secondary mx-auto" style="max-width: 250px;">
-                        <li class="mb-2">✓ Custom interview templates</li>
-                        <li class="mb-2">✓ Team analytics dashboard</li>
-                        <li class="mb-2">✓ API integrations</li>
-                    </ul>
-                </div>
+            <div class="glass-panel hover-lift h-100 p-5 text-start">
+                <h3 class="mb-3" style="font-weight: 600;">For Enterprise</h3>
+                <p class="text-secondary mb-4" style="line-height: 1.6;">Screen candidates efficiently and upskill your existing workforce.</p>
+                <ul class="list-unstyled check-list text-secondary mb-0">
+                    <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Custom interview templates</li>
+                    <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Team analytics dashboard</li>
+                    <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>API integrations</li>
+                </ul>
             </div>
         </div>
     </div>

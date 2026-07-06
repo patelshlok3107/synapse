@@ -7,42 +7,104 @@
         display: flex;
         justify-content: space-between;
         align-items: flex-end;
-        border-bottom: 1px solid #222;
+        flex-wrap: wrap;
+        gap: 1rem;
+        border-bottom: 1px solid rgba(207,136,77,0.18);
         padding-bottom: 1.5rem;
     }
-    
+
     .stat-card {
-        background: #111;
-        border: 1px solid #222;
+        background: rgba(10, 6, 2, 0.68);
+        border: 1px solid rgba(207,136,77,0.18);
         border-radius: 20px;
         padding: 2rem;
-        transition: transform 0.3s;
+        transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
         height: 100%;
         position: relative;
         overflow: hidden;
+        backdrop-filter: blur(14px) saturate(1.3);
+        -webkit-backdrop-filter: blur(14px) saturate(1.3);
     }
     .stat-card:hover {
         transform: translateY(-5px);
-        border-color: rgba(0,229,143,0.3);
+        border-color: rgba(207,136,77,0.45);
+        box-shadow: 0 18px 50px rgba(0,0,0,0.5), 0 0 30px rgba(207,136,77,0.08);
     }
     .stat-card::before {
         content: '';
         position: absolute;
-        top: 0; right: 0; width: 100px; height: 100px;
-        background: radial-gradient(circle, rgba(0,229,143,0.1) 0%, transparent 70%);
-        border-bottom-left-radius: 100px;
+        top: 0; right: 0; width: 120px; height: 120px;
+        background: radial-gradient(circle, rgba(207,136,77,0.12) 0%, transparent 70%);
+        border-bottom-left-radius: 120px;
+        pointer-events: none;
     }
-    
+    .stat-label {
+        letter-spacing: 0.14em;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: var(--text-secondary);
+        margin-bottom: 0.75rem;
+    }
+    .stat-value {
+        font-size: 3.2rem;
+        font-weight: 700;
+        line-height: 1;
+        color: var(--text-primary);
+    }
+    .stat-value.accent { color: var(--accent); text-shadow: 0 0 24px var(--accent-glow); }
+
     .list-group-custom .list-group-item {
-        background: #0a0a0a;
-        border: 1px solid #1a1a1a;
+        background: rgba(10, 6, 2, 0.62) !important;
+        border: 1px solid rgba(207,136,77,0.14) !important;
         margin-bottom: 10px;
-        border-radius: 12px !important;
-        transition: all 0.3s;
+        border-radius: 14px !important;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
     }
     .list-group-custom .list-group-item:hover {
-        background: #111;
-        border-color: #333;
+        background: rgba(20, 12, 4, 0.8) !important;
+        border-color: rgba(207,136,77,0.4) !important;
+        transform: translateX(4px);
+    }
+
+    .score-badge {
+        background: rgba(207,136,77,0.12);
+        color: var(--accent);
+        border: 1px solid rgba(207,136,77,0.5);
+        font-size: 1rem;
+        padding: 8px 14px;
+        border-radius: 10px;
+        font-weight: 700;
+    }
+    .pending-badge {
+        background: rgba(196,173,149,0.12);
+        color: var(--text-secondary);
+        border: 1px solid rgba(196,173,149,0.3);
+        padding: 8px 14px;
+        border-radius: 10px;
+        font-weight: 600;
+    }
+
+    .empty-state {
+        background: rgba(10, 6, 2, 0.55);
+        border: 1px dashed rgba(207,136,77,0.35);
+        border-radius: 16px;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+
+    .section-heading {
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+    .section-heading::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: linear-gradient(90deg, rgba(207,136,77,0.35), transparent);
     }
 
     /* Chatbot Styles */
@@ -52,36 +114,37 @@
         right: 30px;
         z-index: 1000;
     }
-    
+
     #chat-toggle {
         width: 60px;
         height: 60px;
         border-radius: 50%;
-        background: var(--neon-green);
-        color: #000;
+        background: var(--accent);
+        color: #0a0500;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 24px;
         cursor: pointer;
-        box-shadow: 0 5px 20px rgba(0,229,143,0.4);
-        transition: transform 0.3s;
+        box-shadow: 0 5px 24px var(--accent-glow);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-    #chat-toggle:hover { transform: scale(1.1); }
-    
+    #chat-toggle:hover { transform: scale(1.1); box-shadow: 0 8px 32px rgba(207,136,77,0.6); }
+
     #chat-window {
         position: absolute;
         bottom: 80px;
         right: 0;
         width: 350px;
         height: 500px;
-        background: #111;
-        border: 1px solid #333;
+        background: rgba(14, 9, 3, 0.96);
+        border: 1px solid rgba(207,136,77,0.3);
         border-radius: 20px;
         display: flex;
         flex-direction: column;
         overflow: hidden;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        box-shadow: 0 10px 50px rgba(0,0,0,0.65);
+        backdrop-filter: blur(18px) saturate(1.3);
+        -webkit-backdrop-filter: blur(18px) saturate(1.3);
         opacity: 0;
         pointer-events: none;
         transform: translateY(20px);
@@ -92,14 +155,19 @@
         pointer-events: all;
         transform: translateY(0);
     }
-    
+
     .chat-header {
-        background: #1a1a1a;
+        background: rgba(20, 12, 4, 0.9);
         padding: 15px 20px;
-        border-bottom: 1px solid #333;
+        border-bottom: 1px solid rgba(207,136,77,0.2);
         display: flex;
         justify-content: space-between;
         align-items: center;
+    }
+    .chat-status {
+        display: block;
+        font-size: 0.75rem;
+        color: var(--accent);
     }
     .chat-messages {
         flex: 1;
@@ -114,40 +182,44 @@
         padding: 12px 16px;
         border-radius: 16px;
         font-size: 0.9rem;
-        line-height: 1.4;
+        line-height: 1.5;
     }
     .msg-user {
         align-self: flex-end;
-        background: var(--neon-green);
-        color: #000;
+        background: var(--accent);
+        color: #0a0500;
         border-bottom-right-radius: 4px;
+        font-weight: 500;
     }
     .msg-ai {
         align-self: flex-start;
-        background: #222;
-        color: #fff;
+        background: rgba(207,136,77,0.1);
+        border: 1px solid rgba(207,136,77,0.18);
+        color: var(--text-primary);
         border-bottom-left-radius: 4px;
     }
     .chat-input-area {
         padding: 15px;
-        background: #1a1a1a;
-        border-top: 1px solid #333;
+        background: rgba(20, 12, 4, 0.9);
+        border-top: 1px solid rgba(207,136,77,0.2);
         display: flex;
         gap: 10px;
     }
     .chat-input {
         flex: 1;
-        background: #0a0a0a;
-        border: 1px solid #333;
+        background: rgba(8, 5, 2, 0.7);
+        border: 1px solid rgba(207,136,77,0.25);
         border-radius: 20px;
         padding: 8px 15px;
-        color: #fff;
+        color: var(--text-primary);
         outline: none;
+        transition: border-color 0.3s ease;
     }
-    .chat-input:focus { border-color: var(--neon-green); }
+    .chat-input::placeholder { color: rgba(196,173,149,0.55); }
+    .chat-input:focus { border-color: var(--accent); }
     .chat-send {
-        background: var(--neon-green);
-        color: #000;
+        background: var(--accent);
+        color: #0a0500;
         border: none;
         border-radius: 50%;
         width: 40px;
@@ -156,7 +228,9 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        transition: transform 0.2s ease;
     }
+    .chat-send:hover { transform: scale(1.08); }
     .typing-indicator {
         display: none;
         align-self: flex-start;
@@ -166,20 +240,20 @@
     .typing-indicator span {
         display: inline-block;
         width: 6px; height: 6px;
-        background: #666;
+        background: rgba(196,173,149,0.6);
         border-radius: 50%;
         margin-right: 4px;
         animation: typing 1s infinite alternate;
     }
     .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
     .typing-indicator span:nth-child(3) { animation-delay: 0.4s; margin-right: 0; }
-    @keyframes typing { to { transform: translateY(-4px); background: #fff; } }
+    @keyframes typing { to { transform: translateY(-4px); background: var(--accent); } }
 </style>
 
 <div class="dashboard-header">
     <div>
-        <h1 class="h2 mb-1" style="font-weight: 700;">Welcome back, <span style="color: var(--neon-green); font-family: 'Caveat', cursive; font-size: 1.2em;">{{ user.username }}</span></h1>
-        <p class="text-secondary mb-0">Here's a summary of your interview preparation progress.</p>
+        <h1 class="h2 mb-1" style="font-weight: 700;">Welcome back, <span class="cursive-accent">{{ user.username }}</span></h1>
+        <p class="text-secondary mb-0">Here&apos;s a summary of your interview preparation progress.</p>
     </div>
     <div>
         <a href="{% url 'core:start_interview' %}" class="btn btn-primary px-4" style="border-radius: 20px;">+ New Interview</a>
@@ -189,21 +263,21 @@
 <div class="row g-4 mb-5">
     <div class="col-md-4">
         <div class="stat-card">
-            <p class="text-secondary mb-1 text-uppercase" style="letter-spacing: 0.1em; font-size: 0.8rem;">Interviews Completed</p>
-            <h2 class="display-4 text-white font-weight-bold">{{ total_interviews }}</h2>
+            <p class="stat-label">Interviews Completed</p>
+            <h2 class="stat-value">{{ total_interviews }}</h2>
         </div>
     </div>
     <div class="col-md-4">
-        <div class="stat-card" style="border-color: rgba(0,229,143,0.3);">
-            <p class="text-secondary mb-1 text-uppercase" style="letter-spacing: 0.1em; font-size: 0.8rem;">Average Score</p>
-            <h2 class="display-4 font-weight-bold" style="color: var(--neon-green);">{{ avg_score }}<span style="font-size: 0.5em;">%</span></h2>
+        <div class="stat-card" style="border-color: rgba(207,136,77,0.4);">
+            <p class="stat-label">Average Score</p>
+            <h2 class="stat-value accent">{{ avg_score }}<span style="font-size: 0.5em;">%</span></h2>
         </div>
     </div>
     <div class="col-md-4">
         <div class="stat-card">
-            <p class="text-secondary mb-1 text-uppercase" style="letter-spacing: 0.1em; font-size: 0.8rem;">Action Center</p>
-            <h5 class="text-white mt-3">Ready to improve?</h5>
-            <a href="{% url 'core:upload_resume' %}" class="btn btn-outline-light btn-sm mt-2" style="border-radius: 12px;">Upload New Resume</a>
+            <p class="stat-label">Action Center</p>
+            <h5 style="color: var(--text-primary);" class="mt-2">Ready to improve?</h5>
+            <a href="{% url 'core:upload_resume' %}" class="btn btn-outline-primary btn-sm mt-2" style="border-radius: 12px;">Upload New Resume</a>
         </div>
     </div>
 </div>
@@ -211,29 +285,27 @@
 <div class="row g-5">
     <!-- Recent Interviews -->
     <div class="col-md-6">
-        <h4 class="mb-4">Recent Interviews</h4>
+        <h4 class="mb-4 section-heading">Recent Interviews</h4>
         <div class="list-group list-group-custom">
             {% if interviews %}
                 {% for interview in interviews|slice:":5" %}
                 <div class="list-group-item p-4 d-flex justify-content-between align-items-center">
                     <div>
-                        <h6 class="text-white mb-1">{{ interview.interview_type }}</h6>
+                        <h6 class="mb-1" style="color: var(--text-primary);">{{ interview.interview_type }}</h6>
                         <small class="text-secondary">{{ interview.created_at|date:"M d, Y" }}</small>
                     </div>
                     <div>
                         {% if interview.status == 'Completed' %}
-                            <span class="badge" style="background: rgba(0,229,143,0.1); color: var(--neon-green); border: 1px solid var(--neon-green); font-size: 1rem; padding: 8px 12px;">
-                                {{ interview.overall_score|default:0|floatformat:1 }}%
-                            </span>
+                            <span class="score-badge">{{ interview.overall_score|default:0|floatformat:1 }}%</span>
                         {% else %}
-                            <span class="badge bg-secondary text-dark px-3 py-2">Pending</span>
+                            <span class="pending-badge">Pending</span>
                         {% endif %}
                     </div>
                 </div>
                 {% endfor %}
             {% else %}
-                <div class="text-center p-5 rounded" style="background: #111; border: 1px dashed #333;">
-                    <p class="text-muted mb-3">No interviews attempted yet.</p>
+                <div class="text-center p-5 empty-state">
+                    <p class="text-secondary mb-3">No interviews attempted yet.</p>
                     <a href="{% url 'core:start_interview' %}" class="btn btn-outline-primary btn-sm">Start Practice</a>
                 </div>
             {% endif %}
@@ -242,21 +314,21 @@
 
     <!-- Uploaded Resumes -->
     <div class="col-md-6">
-        <h4 class="mb-4">Your Resumes</h4>
+        <h4 class="mb-4 section-heading">Your Resumes</h4>
         <div class="list-group list-group-custom">
             {% if resumes %}
                 {% for resume in resumes %}
                 <a href="{% url 'core:resume_detail' resume.id %}" class="list-group-item p-4 d-flex justify-content-between align-items-center text-decoration-none">
                     <div>
-                        <h6 class="text-white mb-1">Resume {{ forloop.counter }}</h6>
+                        <h6 class="mb-1" style="color: var(--text-primary);">Resume {{ forloop.counter }}</h6>
                         <small class="text-secondary">Uploaded: {{ resume.uploaded_at|date:"M d, Y" }}</small>
                     </div>
-                    <span class="text-secondary" style="font-size: 1.5rem;">→</span>
+                    <span style="color: var(--accent); font-size: 1.4rem;" aria-hidden="true">&rarr;</span>
                 </a>
                 {% endfor %}
             {% else %}
-                <div class="text-center p-5 rounded" style="background: #111; border: 1px dashed #333;">
-                    <p class="text-muted mb-3">You haven't uploaded any resumes yet.</p>
+                <div class="text-center p-5 empty-state">
+                    <p class="text-secondary mb-3">You haven&apos;t uploaded any resumes yet.</p>
                     <a href="{% url 'core:upload_resume' %}" class="btn btn-outline-primary btn-sm">Upload Resume</a>
                 </div>
             {% endif %}
@@ -267,32 +339,34 @@
 <!-- ================= AI CHATBOT WIDGET ================= -->
 <div id="chat-widget">
     <!-- Chat Window -->
-    <div id="chat-window">
+    <div id="chat-window" role="dialog" aria-label="AI Coach chat">
         <div class="chat-header">
             <div>
-                <strong class="text-white">AI Coach</strong>
-                <span style="display: block; font-size: 0.75rem; color: #00E58F;">Online</span>
+                <strong style="color: var(--text-primary);">AI Coach</strong>
+                <span class="chat-status">Online</span>
             </div>
-            <button id="close-chat" class="btn-close btn-close-white" style="font-size: 0.8rem;"></button>
+            <button id="close-chat" class="btn-close btn-close-white" style="font-size: 0.8rem;" aria-label="Close chat"></button>
         </div>
-        
+
         <div class="chat-messages" id="chat-messages">
-            <div class="msg msg-ai">Hi {{ user.username }}! I'm your AI Interview Coach. How can I help you prepare today?</div>
-            
+            <div class="msg msg-ai">Hi {{ user.username }}! I&apos;m your AI Interview Coach. How can I help you prepare today?</div>
+
             <div class="typing-indicator" id="typing-indicator">
                 <span></span><span></span><span></span>
             </div>
         </div>
-        
+
         <div class="chat-input-area">
-            <input type="text" id="chat-input" class="chat-input" placeholder="Ask a question..." autocomplete="off">
-            <button id="send-btn" class="chat-send">➤</button>
+            <input type="text" id="chat-input" class="chat-input" placeholder="Ask a question..." autocomplete="off" aria-label="Chat message">
+            <button id="send-btn" class="chat-send" aria-label="Send message">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 14 0"/><path d="m13 6 6 6-6 6"/></svg>
+            </button>
         </div>
     </div>
-    
+
     <!-- Floating Toggle Button -->
-    <div id="chat-toggle">
-        💬
+    <div id="chat-toggle" role="button" tabindex="0" aria-label="Open AI Coach chat">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
     </div>
 </div>
 
@@ -309,35 +383,35 @@ document.addEventListener('DOMContentLoaded', function() {
     const messagesBox = document.getElementById('chat-messages');
     const typingIndicator = document.getElementById('typing-indicator');
     const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-    
+
     // Toggle window
     chatToggle.addEventListener('click', () => {
         chatWindow.classList.toggle('open');
         if(chatWindow.classList.contains('open')) chatInput.focus();
     });
-    
+
     closeChat.addEventListener('click', () => {
         chatWindow.classList.remove('open');
     });
-    
+
     // Send message logic
     function sendMessage() {
         const text = chatInput.value.trim();
         if(!text) return;
-        
+
         // Append user msg
         const userMsg = document.createElement('div');
         userMsg.className = 'msg msg-user';
         userMsg.textContent = text;
         messagesBox.insertBefore(userMsg, typingIndicator);
-        
+
         chatInput.value = '';
         messagesBox.scrollTop = messagesBox.scrollHeight;
-        
+
         // Show typing
         typingIndicator.style.display = 'block';
         messagesBox.scrollTop = messagesBox.scrollHeight;
-        
+
         // Fetch AI reply using streaming
         fetch('{% url "core:chatbot" %}', {
             method: 'POST',
@@ -349,21 +423,21 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(async res => {
             typingIndicator.style.display = 'none';
-            
+
             // Handle errors
             if (!res.ok) {
                 const data = await res.json();
                 throw new Error(data.error || 'Network response was not ok');
             }
-            
+
             const aiMsg = document.createElement('div');
             aiMsg.className = 'msg msg-ai';
             messagesBox.insertBefore(aiMsg, typingIndicator);
             messagesBox.scrollTop = messagesBox.scrollHeight;
-            
+
             const reader = res.body.getReader();
             const decoder = new TextDecoder();
-            
+
             while (true) {
                 const { done, value } = await reader.read();
                 if (done) break;
@@ -383,10 +457,10 @@ document.addEventListener('DOMContentLoaded', function() {
             messagesBox.scrollTop = messagesBox.scrollHeight;
         });
     }
-    
+
     sendBtn.addEventListener('click', sendMessage);
     chatInput.addEventListener('keypress', (e) => {
-        if(e.key === 'Enter') sendMessage();
+        if(e.key === 'Enter' && !e.isComposing && e.keyCode !== 229) sendMessage();
     });
 });
 </script>

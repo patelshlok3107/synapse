@@ -2,34 +2,37 @@
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card p-4 mt-5">
-            <h2 class="text-center mb-4">Start Mock Interview</h2>
-            <p class="text-muted text-center mb-4">Select your parsed resume and the type of interview you want to practice. Our AI will generate 5 targeted questions.</p>
-            
+    <div class="col-lg-6 col-md-8">
+        <div class="text-center mt-4 mb-4">
+            <span class="eyebrow">Mock Interview</span>
+            <h2 class="page-title">Start a <span class="cursive">new session</span></h2>
+        </div>
+        <div class="card p-4 p-md-5">
+            <p class="text-secondary text-center mb-4">Select your parsed resume and the type of interview you want to practice. Our AI will generate 5 targeted questions.</p>
+
             <form method="post">
                 {% csrf_token %}
-                <div class="mb-3">
-                    <label class="form-label">Select Resume (Optional)</label>
-                    <select name="resume_id" class="form-select">
+                <div class="mb-4">
+                    <label class="form-label" for="resume-select">Select Resume <span class="text-secondary" style="font-weight: 400;">(optional)</span></label>
+                    <select name="resume_id" id="resume-select" class="form-select">
                         <option value="">-- No Resume (General Questions) --</option>
                         {% for resume in resumes %}
                             <option value="{{ resume.id }}">Resume uploaded {{ resume.uploaded_at|date:"F d, Y" }}</option>
                         {% endfor %}
                     </select>
                 </div>
-                
-                <div class="mb-3">
-                    <label class="form-label">Interview Type</label>
-                    <select name="interview_type" class="form-select" required>
+
+                <div class="mb-4">
+                    <label class="form-label" for="type-select">Interview Type</label>
+                    <select name="interview_type" id="type-select" class="form-select" required>
                         {% for value, label in types %}
                             <option value="{{ value }}">{{ label }}</option>
                         {% endfor %}
                     </select>
                 </div>
-                
+
                 <div class="d-grid mt-4">
-                    <button type="submit" class="btn btn-success btn-lg">Generate Questions</button>
+                    <button type="submit" class="btn btn-primary btn-lg" style="border-radius: 12px;">Generate Questions</button>
                 </div>
             </form>
         </div>

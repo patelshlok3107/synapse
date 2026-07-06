@@ -167,7 +167,7 @@
 
 .hero-sub {
     font-size: 1.25rem;
-    color: #888;
+    color: #c4ad95;
     max-width: 550px;
     margin: 2rem auto 3rem;
     z-index: 2;
@@ -234,7 +234,7 @@
     font-size: 0.75rem;
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    color: #555;
+    color: #a08a70;
 }
 .scroll-line {
     width: 1px;
@@ -292,7 +292,7 @@
 }
 .stat-label {
     font-size: 0.9rem;
-    color: #666;
+    color: #b8a090;
     text-transform: uppercase;
     letter-spacing: 0.15em;
 }
@@ -338,10 +338,11 @@
     width: 60px; height: 60px;
     border-radius: 16px;
     background: rgba(207,136,77,0.1);
+    border: 1px solid rgba(207,136,77,0.25);
+    color: #cf884d;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.8rem;
     margin-bottom: 1.5rem;
 }
 
@@ -351,7 +352,7 @@
     margin-bottom: 1rem;
 }
 .feature-card p {
-    color: #888;
+    color: #c4ad95;
     line-height: 1.7;
     font-size: 0.95rem;
 }
@@ -401,9 +402,12 @@
 .marquee-wrap {
     overflow: hidden;
     white-space: nowrap;
-    border-top: 1px solid #1a1a1a;
-    border-bottom: 1px solid #1a1a1a;
+    border-top: 1px solid rgba(207,136,77,0.15);
+    border-bottom: 1px solid rgba(207,136,77,0.15);
     padding: 30px 0;
+    background: rgba(8, 5, 2, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 }
 .marquee-track {
     display: inline-block;
@@ -412,7 +416,7 @@
 .marquee-track span {
     font-size: 2rem;
     font-weight: 700;
-    color: #222;
+    color: rgba(240, 232, 220, 0.28);
     margin: 0 60px;
     text-transform: uppercase;
     letter-spacing: 0.1em;
@@ -518,17 +522,23 @@
             </div>
             <div class="feature-grid">
                 <div class="feature-card sr">
-                    <div class="feature-icon">📄</div>
+                    <div class="feature-icon">
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+                    </div>
                     <h3>Upload Your Resume</h3>
                     <p>Our AI parses your resume in seconds — extracting skills, experience, education, and projects to build your profile.</p>
                 </div>
                 <div class="feature-card sr sr-delay-1">
-                    <div class="feature-icon">🎯</div>
+                    <div class="feature-icon">
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                    </div>
                     <h3>AI Mock Interview</h3>
                     <p>Get personalized interview questions generated from your resume. Choose Technical, Behavioral, HR, or Project-based rounds.</p>
                 </div>
                 <div class="feature-card sr sr-delay-2">
-                    <div class="feature-icon">📊</div>
+                    <div class="feature-icon">
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+                    </div>
                     <h3>Instant AI Feedback</h3>
                     <p>Receive detailed scoring on technical accuracy, communication, relevance, grammar and confidence — with actionable tips.</p>
                 </div>

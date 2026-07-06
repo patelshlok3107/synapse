@@ -1,54 +1,76 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<style>
+    .parsed-card {
+        background: rgba(20, 12, 4, 0.7) !important;
+        border: 1px solid rgba(207,136,77,0.16) !important;
+        border-radius: 16px;
+        transition: border-color 0.3s ease, transform 0.3s ease;
+    }
+    .parsed-card:hover {
+        border-color: rgba(207,136,77,0.4) !important;
+        transform: translateY(-3px);
+    }
+    .parsed-card .card-title {
+        color: var(--accent);
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        margin-bottom: 0.75rem;
+    }
+</style>
+
 <div class="mb-4">
-    <a href="{% url 'core:dashboard' %}" class="btn btn-outline-secondary">&larr; Back to Dashboard</a>
+    <a href="{% url 'core:dashboard' %}" class="btn btn-outline-primary btn-sm" style="border-radius: 20px;">&larr; Back to Dashboard</a>
 </div>
 
-<div class="card p-4">
-    <h2 class="mb-4">Resume Details</h2>
-    <p><strong>Uploaded File:</strong> <a href="{{ resume.file.url }}" target="_blank">View File</a></p>
-    <p class="text-muted">Uploaded on: {{ resume.uploaded_at|date:"F d, Y" }}</p>
+<div class="card p-4 p-md-5">
+    <span class="eyebrow">Parsed Resume</span>
+    <h2 class="page-title mb-4">Resume <span class="cursive">details</span></h2>
+    <p class="mb-1"><strong>Uploaded file:</strong> <a href="{{ resume.file.url }}" target="_blank" rel="noopener">View file</a></p>
+    <p class="text-secondary">Uploaded on {{ resume.uploaded_at|date:"F d, Y" }}</p>
 
-    <h4 class="mt-4 border-bottom pb-2">Parsed Information</h4>
-    
-    <div class="row mt-3">
-        <div class="col-md-6 mb-3">
-            <div class="card h-100" style="background: #161616;">
+    <h4 class="mt-4 pb-2" style="border-bottom: 1px solid rgba(207,136,77,0.18);">Parsed Information</h4>
+
+    <div class="row mt-3 g-3">
+        <div class="col-md-6">
+            <div class="card parsed-card h-100">
                 <div class="card-body">
-                    <h5 class="card-title text-white">Skills</h5>
-                    <p class="card-text text-secondary">{{ resume.parsed_skills|default:"Not found" }}</p>
+                    <h5 class="card-title">Skills</h5>
+                    <p class="card-text text-secondary mb-0" style="line-height: 1.6;">{{ resume.parsed_skills|default:"Not found" }}</p>
                 </div>
             </div>
         </div>
-        <div class="col-md-6 mb-3">
-            <div class="card h-100" style="background: #161616;">
+        <div class="col-md-6">
+            <div class="card parsed-card h-100">
                 <div class="card-body">
-                    <h5 class="card-title text-white">Education</h5>
-                    <p class="card-text text-secondary">{{ resume.parsed_education|default:"Not found" }}</p>
+                    <h5 class="card-title">Education</h5>
+                    <p class="card-text text-secondary mb-0" style="line-height: 1.6;">{{ resume.parsed_education|default:"Not found" }}</p>
                 </div>
             </div>
         </div>
-        <div class="col-md-6 mb-3">
-            <div class="card h-100" style="background: #161616;">
+        <div class="col-md-6">
+            <div class="card parsed-card h-100">
                 <div class="card-body">
-                    <h5 class="card-title text-white">Experience</h5>
-                    <p class="card-text text-secondary">{{ resume.parsed_experience|default:"Not found" }}</p>
+                    <h5 class="card-title">Experience</h5>
+                    <p class="card-text text-secondary mb-0" style="line-height: 1.6;">{{ resume.parsed_experience|default:"Not found" }}</p>
                 </div>
             </div>
         </div>
-        <div class="col-md-6 mb-3">
-            <div class="card h-100" style="background: #161616;">
+        <div class="col-md-6">
+            <div class="card parsed-card h-100">
                 <div class="card-body">
-                    <h5 class="card-title text-white">Projects</h5>
-                    <p class="card-text text-secondary">{{ resume.parsed_projects|default:"Not found" }}</p>
+                    <h5 class="card-title">Projects</h5>
+                    <p class="card-text text-secondary mb-0" style="line-height: 1.6;">{{ resume.parsed_projects|default:"Not found" }}</p>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="d-grid mt-4">
-        <a href="{% url 'core:start_interview' %}" class="btn btn-success btn-lg">Generate Mock Interview</a>
+        <a href="{% url 'core:start_interview' %}" class="btn btn-primary btn-lg" style="border-radius: 12px;">Generate Mock Interview</a>
     </div>
 </div>
 {% endblock %}
